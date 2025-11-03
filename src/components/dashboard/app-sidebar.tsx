@@ -19,6 +19,7 @@ import {
   User,
   Shield,
   Settings,
+  Trophy,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ const menuItems = [
   { href: '/teams', label: 'Teams', icon: Users },
   { href: '/schedule', label: 'Schedule', icon: Calendar },
   { href: '/standings', label: 'Standings', icon: BarChart4 },
+  { href: '/tournaments', label: 'Tournaments', icon: Trophy },
 ];
 
 export function AppSidebar() {
