@@ -80,7 +80,7 @@ const tournaments = [
 const ITEMS_PER_PAGE = 6;
 
 export default function TournamentsPage() {
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<'grid' | 'list'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
