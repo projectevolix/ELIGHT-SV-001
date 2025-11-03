@@ -32,7 +32,7 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
     create: 'Fill out the form to create a new tournament.',
   };
   
-  const showBanner = (mode === 'view' || mode === 'edit') && tournament?.bannerUrl;
+  const showBanner = mode === 'view' && tournament?.bannerUrl;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
