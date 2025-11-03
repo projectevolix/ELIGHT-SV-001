@@ -31,13 +31,15 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
     edit: 'Update the details for the tournament.',
     create: 'Fill out the form to create a new tournament.',
   };
+  
+  const showBanner = (mode === 'view' || mode === 'edit') && tournament?.bannerUrl;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg overflow-y-auto">
-        {mode !== 'create' && tournament?.bannerUrl && (
+        {showBanner && (
           <div className="relative h-48 w-full -mx-6 -mt-6 mb-6">
-            <Image src={tournament.bannerUrl} alt={tournament.name} layout="fill" objectFit="cover" />
+            <Image src={tournament.bannerUrl!} alt={tournament.name} layout="fill" objectFit="cover" />
           </div>
         )}
         <SheetHeader>

@@ -95,11 +95,6 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {isViewMode && imagePreview && (
-          <div className="relative h-48 w-full rounded-lg overflow-hidden -mt-8">
-            <Image src={imagePreview} alt="Tournament Banner" layout="fill" objectFit="cover" />
-          </div>
-        )}
         <FormField
           control={form.control}
           name="name"
@@ -255,7 +250,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
             <FormItem>
               <FormLabel>Banner Image</FormLabel>
               {isViewMode ? (
-                field.value ? null : <p className="text-sm text-muted-foreground">No banner image.</p>
+                imagePreview ? null : <p className="text-sm text-muted-foreground">No banner image.</p>
               ) : (
                 <FormControl>
                    <div className="flex flex-col items-center justify-center w-full">
