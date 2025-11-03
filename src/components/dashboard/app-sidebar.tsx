@@ -20,12 +20,9 @@ import {
   Shield,
   Settings,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-
-const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -68,8 +65,9 @@ export function AppSidebar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-auto w-full justify-start gap-3 p-2">
               <Avatar className="h-9 w-9">
-                {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt={userAvatar.description} data-ai-hint={userAvatar.imageHint}/>}
-                <AvatarFallback>AV</AvatarFallback>
+                <AvatarFallback>
+                  <User className="h-5 w-5" />
+                </AvatarFallback>
               </Avatar>
               <div className="text-left group-data-[collapsible=icon]:hidden">
                 <p className="font-medium text-sm">Andy Vogel</p>
