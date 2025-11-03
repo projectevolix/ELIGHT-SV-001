@@ -145,13 +145,19 @@ export default function TournamentsPage() {
   };
 
   const filteredTournaments = useMemo(() => {
-    return tournaments
+    let filtered = tournaments
       .filter((t) =>
         t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.venue.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .filter((t) => statusFilter === 'all' || t.status === statusFilter);
-  }, [searchTerm, statusFilter, tournaments]);
+
+    if (view === 'grid') {
+      filtered = filtered.filter(t => !!t.bannerUrl);
+    }
+    
+    return filtered;
+  }, [searchTerm, statusFilter, tournaments, view]);
 
   const paginatedTournaments = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
