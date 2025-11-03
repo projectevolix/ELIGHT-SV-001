@@ -329,7 +329,7 @@ export default function TournamentsPage() {
             </TableHeader>
             <TableBody>
               {paginatedTournaments.map((tournament) => (
-                <TableRow key={tournament.id}>
+                <TableRow key={tournament.id} onClick={() => handleView(tournament)} className="cursor-pointer">
                   <TableCell className="font-medium font-headline">{tournament.name}</TableCell>
                   <TableCell>{tournament.grade}</TableCell>
                   <TableCell>{tournament.venue}</TableCell>
@@ -341,20 +341,20 @@ export default function TournamentsPage() {
                   <TableCell className="text-right">
                      <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleView(tournament)}>
+                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleView(tournament)}}>
                           <Eye className="mr-2 h-4 w-4" />
                           <span>View</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(tournament)}>
+                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleEdit(tournament)}}>
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteClick(tournament)} className="text-destructive">
+                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleDeleteClick(tournament)}} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Delete</span>
                         </DropdownMenuItem>
