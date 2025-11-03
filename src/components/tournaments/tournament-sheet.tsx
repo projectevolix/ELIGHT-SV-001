@@ -55,7 +55,7 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
             </SheetClose>
         )}
         <div className="px-6">
-            <SheetHeader className={showBanner ? 'mt-6' : ''}>
+            <SheetHeader className="mt-6">
               <SheetTitle>{titles[mode]}</SheetTitle>
               <SheetDescription>{descriptions[mode]}</SheetDescription>
             </SheetHeader>
