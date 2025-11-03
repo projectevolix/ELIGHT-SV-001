@@ -6,11 +6,13 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetClose,
 } from '@/components/ui/sheet';
 import { Tournament } from '@/app/tournaments/page';
 import { TournamentForm } from './tournament-form';
 import { TournamentDetails } from './tournament-details';
 import Image from 'next/image';
+import { X } from 'lucide-react';
 
 type TournamentSheetProps = {
   open: boolean;
@@ -38,13 +40,22 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg overflow-y-auto p-0" showCloseButton={false}>
-        {showBanner && (
-          <div className="relative h-48 w-full mb-6">
+        {showBanner ? (
+          <div className="relative h-48 w-full">
             <Image src={tournament.bannerUrl!} alt={tournament.name} layout="fill" objectFit="cover" />
+            <SheetClose className="absolute right-4 top-4 rounded-full bg-black/50 p-1 text-white/80 opacity-70 ring-offset-background transition-opacity hover:opacity-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </SheetClose>
           </div>
+        ) : (
+           <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </SheetClose>
         )}
         <div className="px-6">
-            <SheetHeader>
+            <SheetHeader className={showBanner ? 'mt-6' : ''}>
               <SheetTitle>{titles[mode]}</SheetTitle>
               <SheetDescription>{descriptions[mode]}</SheetDescription>
             </SheetHeader>
