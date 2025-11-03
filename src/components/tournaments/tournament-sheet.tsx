@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { Tournament } from '@/app/tournaments/page';
 import { TournamentForm } from './tournament-form';
+import Image from 'next/image';
 
 type TournamentSheetProps = {
   open: boolean;
@@ -34,6 +35,11 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg overflow-y-auto">
+        {mode !== 'create' && tournament?.bannerUrl && (
+          <div className="relative h-48 w-full -mx-6 -mt-6 mb-6">
+            <Image src={tournament.bannerUrl} alt={tournament.name} layout="fill" objectFit="cover" />
+          </div>
+        )}
         <SheetHeader>
           <SheetTitle>{titles[mode]}</SheetTitle>
           <SheetDescription>{descriptions[mode]}</SheetDescription>

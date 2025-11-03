@@ -15,13 +15,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Tournament } from '@/app/tournaments/page';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -44,6 +45,7 @@ type TournamentFormProps = {
 
 export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps) {
   const isViewMode = mode === 'view';
+  const [imagePreview, setImagePreview] = useState<string | null>(tournament?.bannerUrl || null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,14 +60,16 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
   });
   
   useEffect(() => {
-    form.reset({
+    const defaultValues = {
       name: '',
       grade: 'Club',
       venue: '',
       status: 'Upcoming',
       bannerUrl: '',
       ...tournament,
-    });
+    };
+    form.reset(defaultValues);
+    setImagePreview(defaultValues.bannerUrl || null);
   }, [tournament, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -75,9 +79,27 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
     });
   }
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setImagePreview(dataUrl);
+        form.setValue('bannerUrl', dataUrl, { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {isViewMode && imagePreview && (
+          <div className="relative h-48 w-full rounded-lg overflow-hidden -mt-8">
+            <Image src={imagePreview} alt="Tournament Banner" layout="fill" objectFit="cover" />
+          </div>
+        )}
         <FormField
           control={form.control}
           name="name"
@@ -231,11 +253,40 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
           name="bannerUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Banner Image URL</FormLabel>
-              <FormControl>
-                <Input placeholder="https://example.com/banner.jpg" {...field} disabled={isViewMode} />
-              </FormControl>
-              <FormDescription>Optional URL for the tournament's banner image.</FormDescription>
+              <FormLabel>Banner Image</FormLabel>
+              {isViewMode ? (
+                field.value ? null : <p className="text-sm text-muted-foreground">No banner image.</p>
+              ) : (
+                <FormControl>
+                   <div className="flex flex-col items-center justify-center w-full">
+                    <label
+                      htmlFor="dropzone-file"
+                      className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
+                    >
+                      {imagePreview ? (
+                        <div className="relative w-full h-full">
+                           <Image src={imagePreview} alt="Banner Preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
+                              Click or drag file to replace
+                           </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <UploadCloud className="w-8 h-8 mb-4 text-muted-foreground" />
+                          <p className="mb-2 text-sm text-muted-foreground">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground">SVG, PNG, JPG or GIF</p>
+                        </div>
+                      )}
+                      <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+                    </label>
+                  </div>
+                </FormControl>
+              )}
+               <FormDescription>
+                {isViewMode ? "" : "Upload a banner image for the tournament."}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
