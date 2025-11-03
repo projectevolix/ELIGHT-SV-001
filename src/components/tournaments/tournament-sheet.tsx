@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { Tournament } from '@/app/tournaments/page';
 import { TournamentForm } from './tournament-form';
+import { TournamentDetails } from './tournament-details';
 import Image from 'next/image';
 
 type TournamentSheetProps = {
@@ -47,7 +48,11 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
           <SheetDescription>{descriptions[mode]}</SheetDescription>
         </SheetHeader>
         <div className="py-8">
-          <TournamentForm mode={mode} tournament={tournament} onSave={onSave} />
+          {mode === 'view' ? (
+            <TournamentDetails tournament={tournament} />
+          ) : (
+            <TournamentForm mode={mode} tournament={tournament} onSave={onSave} />
+          )}
         </div>
       </SheetContent>
     </Sheet>
