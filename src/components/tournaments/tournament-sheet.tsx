@@ -37,22 +37,24 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-lg overflow-y-auto">
+      <SheetContent className="sm:max-w-lg overflow-y-auto p-0" showCloseButton={false}>
         {showBanner && (
-          <div className="relative h-48 w-full -mx-6 -mt-6 mb-6">
+          <div className="relative h-48 w-full mb-6">
             <Image src={tournament.bannerUrl!} alt={tournament.name} layout="fill" objectFit="cover" />
           </div>
         )}
-        <SheetHeader>
-          <SheetTitle>{titles[mode]}</SheetTitle>
-          <SheetDescription>{descriptions[mode]}</SheetDescription>
-        </SheetHeader>
-        <div className="py-8">
-          {mode === 'view' ? (
-            <TournamentDetails tournament={tournament} />
-          ) : (
-            <TournamentForm mode={mode} tournament={tournament} onSave={onSave} />
-          )}
+        <div className="px-6">
+            <SheetHeader>
+              <SheetTitle>{titles[mode]}</SheetTitle>
+              <SheetDescription>{descriptions[mode]}</SheetDescription>
+            </SheetHeader>
+            <div className="py-8">
+              {mode === 'view' ? (
+                <TournamentDetails tournament={tournament} />
+              ) : (
+                <TournamentForm mode={mode} tournament={tournament} onSave={onSave} />
+              )}
+            </div>
         </div>
       </SheetContent>
     </Sheet>
