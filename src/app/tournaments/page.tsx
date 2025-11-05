@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,9 @@ export type Tournament = {
   venue: string;
   startDate: Date;
   endDate: Date;
+  registrationStartDate: Date;
+  registrationEndDate: Date;
+  admin: string;
   status: 'Ongoing' | 'Upcoming' | 'Finished';
   bannerUrl?: string;
 };
@@ -35,6 +38,9 @@ const tournamentsData: Tournament[] = [
     venue: 'North America',
     startDate: new Date('2024-07-20'),
     endDate: new Date('2024-08-10'),
+    registrationStartDate: new Date('2024-06-01'),
+    registrationEndDate: new Date('2024-07-01'),
+    admin: 'Andy Vogel',
     status: 'Ongoing',
     bannerUrl: 'https://picsum.photos/seed/1/600/400'
   },
@@ -45,6 +51,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-09-01'),
     endDate: new Date('2024-09-15'),
+    registrationStartDate: new Date('2024-07-15'),
+    registrationEndDate: new Date('2024-08-15'),
+    admin: 'Jane Doe',
     status: 'Upcoming',
     bannerUrl: 'https://picsum.photos/seed/2/600/400'
   },
@@ -55,6 +64,9 @@ const tournamentsData: Tournament[] = [
     venue: 'APAC',
     startDate: new Date('2024-06-10'),
     endDate: new Date('2024-06-25'),
+    registrationStartDate: new Date('2024-05-01'),
+    registrationEndDate: new Date('2024-06-01'),
+    admin: 'John Smith',
     status: 'Finished',
   },
   {
@@ -64,6 +76,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Europe',
     startDate: new Date('2024-11-20'),
     endDate: new Date('2024-11-28'),
+    registrationStartDate: new Date('2024-10-01'),
+    registrationEndDate: new Date('2024-11-01'),
+    admin: 'Andy Vogel',
     status: 'Upcoming',
   },
     {
@@ -73,6 +88,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-05-01'),
     endDate: new Date('2024-05-15'),
+    registrationStartDate: new Date('2024-03-15'),
+    registrationEndDate: new Date('2024-04-15'),
+    admin: 'Jane Doe',
     status: 'Finished',
     bannerUrl: 'https://picsum.photos/seed/5/600/400'
   },
@@ -83,6 +101,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-07-15'),
     endDate: new Date('2024-07-30'),
+    registrationStartDate: new Date('2024-06-01'),
+    registrationEndDate: new Date('2024-07-01'),
+    admin: 'John Smith',
     status: 'Ongoing',
   },
   {
@@ -92,6 +113,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-08-25'),
     endDate: new Date('2024-09-05'),
+    registrationStartDate: new Date('2024-07-01'),
+    registrationEndDate: new Date('2024-08-01'),
+    admin: 'Andy Vogel',
     status: 'Upcoming',
     bannerUrl: 'https://picsum.photos/seed/7/600/400'
   },
@@ -102,6 +126,9 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-07-01'),
     endDate: new Date('2024-09-30'),
+    registrationStartDate: new Date('2024-05-15'),
+    registrationEndDate: new Date('2024-06-15'),
+    admin: 'Jane Doe',
     status: 'Ongoing',
     bannerUrl: 'https://picsum.photos/seed/8/600/400'
   },
@@ -112,14 +139,24 @@ const tournamentsData: Tournament[] = [
     venue: 'Global',
     startDate: new Date('2024-02-13'),
     endDate: new Date('2024-02-25'),
+    registrationStartDate: new Date('2024-01-01'),
+    registrationEndDate: new Date('2024-02-01'),
+    admin: 'John Smith',
     status: 'Finished',
   },
 ];
 
 const ITEMS_PER_PAGE = 6;
 
+const getStatus = (startDate: Date, endDate: Date): 'Ongoing' | 'Upcoming' | 'Finished' => {
+  const now = new Date();
+  if (now < startDate) return 'Upcoming';
+  if (now > endDate) return 'Finished';
+  return 'Ongoing';
+};
+
 export default function TournamentsPage() {
-  const [tournaments, setTournaments] = useState(tournamentsData);
+  const [tournaments, setTournaments] = useState(() => tournamentsData.map(t => ({...t, status: getStatus(t.startDate, t.endDate)})));
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -130,6 +167,18 @@ export default function TournamentsPage() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [tournamentToDelete, setTournamentToDelete] = useState<Tournament | null>(null);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTournaments(prevTournaments =>
+        prevTournaments.map(t => ({
+          ...t,
+          status: getStatus(t.startDate, t.endDate),
+        }))
+      );
+    }, 60000); // Update status every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -197,11 +246,14 @@ export default function TournamentsPage() {
     setTournamentToDelete(null);
   };
 
-  const handleSave = (data: Tournament) => {
+  const handleSave = (data: Omit<Tournament, 'status'>) => {
+    const status = getStatus(data.startDate, data.endDate);
+    const tournamentWithStatus = { ...data, status };
+
     if (sheetMode === 'create') {
-      setTournaments([...tournaments, { ...data, id: Date.now() }]);
+      setTournaments([...tournaments, { ...tournamentWithStatus, id: Date.now() }]);
     } else {
-      setTournaments(tournaments.map(t => t.id === data.id ? data : t));
+      setTournaments(tournaments.map(t => t.id === data.id ? tournamentWithStatus : t));
     }
     setSheetOpen(false);
   };

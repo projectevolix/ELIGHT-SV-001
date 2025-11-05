@@ -19,7 +19,7 @@ type TournamentSheetProps = {
   onOpenChange: (open: boolean) => void;
   mode: 'view' | 'edit' | 'create';
   tournament: Tournament | null;
-  onSave: (data: Tournament) => void;
+  onSave: (data: Omit<Tournament, 'status'>) => void;
 };
 
 export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }: TournamentSheetProps) {
