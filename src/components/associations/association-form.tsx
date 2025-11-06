@@ -14,9 +14,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEffect } from 'react';
-import { Association } from '@/app/associations/page';
+import type { Association } from '@/app/associations/page';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required.'),
@@ -24,7 +23,6 @@ const formSchema = z.object({
   email: z.string().email('Invalid email address.'),
   phone: z.string().min(10, 'Phone number is required.'),
   president: z.string().min(2, 'President name is required.'),
-  status: z.enum(['Active', 'Inactive']),
 });
 
 type AssociationFormProps = {
@@ -43,7 +41,6 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
       email: '',
       phone: '',
       president: '',
-      status: 'Active',
       ...association,
     },
   });
@@ -55,7 +52,6 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
       email: '',
       phone: '',
       president: '',
-      status: 'Active',
       ...association,
     });
   }, [association, form]);
@@ -141,28 +137,6 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
             />
         </div>
         
-        <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                    </SelectContent>
-                </Select>
-                <FormMessage />
-                </FormItem>
-            )}
-        />
-
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
             <Button type="submit">Save</Button>

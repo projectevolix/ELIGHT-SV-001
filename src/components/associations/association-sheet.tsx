@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Association } from '@/app/associations/page';
+import type { Association } from '@/app/associations/page';
 import { AssociationForm } from './association-form';
 
 type AssociationSheetProps = {

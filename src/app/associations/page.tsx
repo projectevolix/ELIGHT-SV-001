@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MoreVertical, Edit, Trash2, PlusCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AssociationSheet } from '@/components/associations/association-sheet';
 
@@ -22,18 +20,17 @@ export type Association = {
   email: string;
   phone: string;
   president: string;
-  status: 'Active' | 'Inactive';
 };
 
 const initialAssociations: Association[] = [
-  { id: 1, name: 'Ontario Basketball', province: 'Ontario', email: 'info@basketball.on.ca', phone: '416-555-1234', president: 'John Doe', status: 'Active' },
-  { id: 2, name: 'BC Athletics', province: 'British Columbia', email: 'info@bcathletics.org', phone: '604-555-5678', president: 'Jane Smith', status: 'Active' },
-  { id: 3, name: 'Alberta Soccer Association', province: 'Alberta', email: 'mail@albertasoccer.com', phone: '780-555-9012', president: 'Mike Johnson', status: 'Inactive' },
-  { id: 4, name: 'Volleyball Québec', province: 'Québec', email: 'info@volleyball.qc.ca', phone: '514-555-3456', president: 'Emily Brown', status: 'Active' },
-  { id: 5, name: 'Saskatchewan Hockey', province: 'Saskatchewan', email: 'info@sha.sk.ca', phone: '306-555-7890', president: 'Chris Lee', status: 'Active' },
-  { id: 6, name: 'Manitoba Runners Association', province: 'Manitoba', email: 'contact@mra.mb.ca', phone: '204-555-1122', president: 'Patricia Williams', status: 'Active' },
-  { id: 7, name: 'Tennis Newfoundland', province: 'Newfoundland and Labrador', email: 'admin@tennisnl.ca', phone: '709-555-3344', president: 'Robert Davis', status: 'Inactive' },
-  { id: 8, name: 'Swim Nova Scotia', province: 'Nova Scotia', email: 'office@swimnovascotia.com', phone: '902-555-5566', president: 'Linda Martinez', status: 'Active' },
+  { id: 1, name: 'Ontario Basketball', province: 'Ontario', email: 'info@basketball.on.ca', phone: '416-555-1234', president: 'John Doe' },
+  { id: 2, name: 'BC Athletics', province: 'British Columbia', email: 'info@bcathletics.org', phone: '604-555-5678', president: 'Jane Smith' },
+  { id: 3, name: 'Alberta Soccer Association', province: 'Alberta', email: 'mail@albertasoccer.com', phone: '780-555-9012', president: 'Mike Johnson' },
+  { id: 4, name: 'Volleyball Québec', province: 'Québec', email: 'info@volleyball.qc.ca', phone: '514-555-3456', president: 'Emily Brown' },
+  { id: 5, name: 'Saskatchewan Hockey', province: 'Saskatchewan', email: 'info@sha.sk.ca', phone: '306-555-7890', president: 'Chris Lee' },
+  { id: 6, name: 'Manitoba Runners Association', province: 'Manitoba', email: 'contact@mra.mb.ca', phone: '204-555-1122', president: 'Patricia Williams' },
+  { id: 7, name: 'Tennis Newfoundland', province: 'Newfoundland and Labrador', email: 'admin@tennisnl.ca', phone: '709-555-3344', president: 'Robert Davis' },
+  { id: 8, name: 'Swim Nova Scotia', province: 'Nova Scotia', email: 'office@swimnovascotia.com', phone: '902-555-5566', president: 'Linda Martinez' },
 ];
 
 const ITEMS_PER_PAGE = 5;
@@ -41,7 +38,6 @@ const ITEMS_PER_PAGE = 5;
 export default function AssociationsPage() {
   const [associations, setAssociations] = useState<Association[]>(initialAssociations);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedAssociation, setSelectedAssociation] = useState<Association | null>(null);
@@ -49,18 +45,13 @@ export default function AssociationsPage() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [associationToDelete, setAssociationToDelete] = useState<Association | null>(null);
 
-  const getStatusVariant = (status: string) => {
-    return status === 'Active' ? 'default' : 'outline';
-  };
-
   const filteredAssociations = useMemo(() => {
     return associations
       .filter((a) =>
         a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         a.province.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .filter((a) => statusFilter === 'all' || a.status === statusFilter);
-  }, [searchTerm, statusFilter, associations]);
+      );
+  }, [searchTerm, associations]);
 
   const paginatedAssociations = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -122,19 +113,6 @@ export default function AssociationsPage() {
               }}
             />
           </div>
-          <Select value={statusFilter} onValueChange={(value) => {
-            setStatusFilter(value)
-            setCurrentPage(1);
-          }}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
           <Button onClick={handleCreate}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Association
@@ -152,7 +130,6 @@ export default function AssociationsPage() {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>President</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -169,9 +146,6 @@ export default function AssociationsPage() {
                   <TableCell>{association.phone}</TableCell>
                   <TableCell>
                      {association.president}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(association.status)}>{association.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                      <DropdownMenu>
