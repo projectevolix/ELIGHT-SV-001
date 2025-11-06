@@ -38,11 +38,11 @@ export type Event = {
 };
 
 const initialEvents: Event[] = [
-  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', weightClass: 'Featherweight', status: 'Upcoming' },
-  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', weightClass: 'Bantamweight', status: 'Ongoing' },
-  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', weightClass: 'Heavyweight', status: 'Finished' },
-  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', weightClass: 'Lightweight', status: 'Upcoming' },
-  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', weightClass: 'Flyweight', status: 'Finished' },
+  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', weightClass: '58 - 68 kg', status: 'Upcoming' },
+  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', weightClass: '53 - 57 kg', status: 'Ongoing' },
+  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', weightClass: '90+ kg', status: 'Finished' },
+  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', weightClass: '68 - 80 kg', status: 'Upcoming' },
+  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', weightClass: '49 - 53 kg', status: 'Finished' },
 ];
 
 type ManageEventsSheetProps = {
