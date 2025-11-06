@@ -26,22 +26,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Edit, Trash2, PlusCircle, X } from 'lucide-react';
 import { Tournament } from '@/app/tournaments/page';
+import { Badge } from '@/components/ui/badge';
 
 type Event = {
   id: number;
   discipline: string;
   ageCategory: string;
   gender: 'Male' | 'Female' | 'Mixed';
-  maxEntries: number;
-  fee: number;
+  weightClass: string;
+  status: 'Upcoming' | 'Ongoing' | 'Finished';
 };
 
 const initialEvents: Event[] = [
-  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', maxEntries: 64, fee: 25 },
-  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', maxEntries: 32, fee: 40 },
-  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', maxEntries: 16, fee: 50 },
-  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', maxEntries: 64, fee: 20 },
-  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', maxEntries: 64, fee: 20 },
+  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', weightClass: 'Featherweight', status: 'Upcoming' },
+  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', weightClass: 'Bantamweight', status: 'Ongoing' },
+  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', weightClass: 'Heavyweight', status: 'Finished' },
+  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', weightClass: 'Lightweight', status: 'Upcoming' },
+  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', weightClass: 'Flyweight', status: 'Finished' },
 ];
 
 type ManageEventsSheetProps = {
@@ -52,6 +53,19 @@ type ManageEventsSheetProps = {
 
 export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEventsSheetProps) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Ongoing':
+        return 'default';
+      case 'Upcoming':
+        return 'secondary';
+      case 'Finished':
+        return 'outline';
+      default:
+        return 'default';
+    }
+  };
 
   const handleAddEvent = () => {
     // Logic to add a new event - opens another form/dialog
@@ -105,8 +119,8 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                   <TableHead>Discipline</TableHead>
                   <TableHead>Age Category</TableHead>
                   <TableHead>Gender</TableHead>
-                  <TableHead>Max Entries</TableHead>
-                  <TableHead>Fee ($)</TableHead>
+                  <TableHead>Weight Class</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -116,8 +130,10 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                     <TableCell className="font-medium">{event.discipline}</TableCell>
                     <TableCell>{event.ageCategory}</TableCell>
                     <TableCell>{event.gender}</TableCell>
-                    <TableCell>{event.maxEntries}</TableCell>
-                    <TableCell>{event.fee.toFixed(2)}</TableCell>
+                    <TableCell>{event.weightClass}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(event.status)}>{event.status}</Badge>
+                    </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
