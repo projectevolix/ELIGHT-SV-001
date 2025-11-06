@@ -22,12 +22,13 @@ const formSchema = z.object({
   ageCategory: z.string().min(2, 'Age category is required.'),
   gender: z.enum(['Male', 'Female', 'Mixed']),
   weightClass: z.string().min(2, 'Weight class is required.'),
+  status: z.enum(['Upcoming', 'Ongoing', 'Finished']),
 });
 
 type EventFormProps = {
   mode: 'create' | 'edit';
-  event: Omit<Event, 'status'> | null;
-  onSave: (data: Omit<Event, 'status' | 'id'> & { id?: number }) => void;
+  event: Omit<Event, 'status'> | Event | null;
+  onSave: (data: Omit<Event, 'id'> & { id?: number }) => void;
   onCancel: () => void;
 };
 
@@ -39,6 +40,7 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
         ageCategory: '',
         gender: 'Male',
         weightClass: '',
+        status: 'Upcoming',
         ...event,
     },
   });
@@ -49,6 +51,7 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
         ageCategory: '',
         gender: 'Male',
         weightClass: '',
+        status: 'Upcoming',
         ...event,
     });
   }, [event, form]);
@@ -142,6 +145,29 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
               <FormControl>
                 <Input placeholder="e.g. Featherweight" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+               <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Upcoming">Upcoming</SelectItem>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
+                  <SelectItem value="Finished">Finished</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

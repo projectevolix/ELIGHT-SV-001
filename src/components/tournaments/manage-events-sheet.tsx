@@ -7,7 +7,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetClose,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Edit, Trash2, PlusCircle, X } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, PlusCircle } from 'lucide-react';
 import { Tournament } from '@/app/tournaments/page';
 import { Badge } from '@/components/ui/badge';
 import { EventSheet } from './event-sheet';
@@ -88,13 +87,11 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
     setEvents(events.filter(e => e.id !== eventId));
   };
   
-  const handleSaveEvent = (data: Omit<Event, 'id' | 'status'> & { id?: number }) => {
-    const status: Event['status'] = 'Upcoming'; // Default status for new/edited events
-    const eventWithStatus = { ...data, status };
+  const handleSaveEvent = (data: Omit<Event, 'id'> & { id?: number }) => {
     if (eventSheetMode === 'create') {
-        setEvents([...events, { ...eventWithStatus, id: Date.now() }]);
+        setEvents([...events, { ...data, id: Date.now() } as Event]);
     } else {
-        setEvents(events.map(e => e.id === data.id ? { ...eventWithStatus, id: data.id } as Event : e));
+        setEvents(events.map(e => e.id === data.id ? { ...data, id: data.id } as Event : e));
     }
     setEventSheetOpen(false);
   };
@@ -103,8 +100,8 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="sm:max-w-4xl p-0">
-          <SheetHeader className="p-6">
+        <SheetContent className="sm:max-w-4xl p-6">
+          <SheetHeader>
             <div className="flex items-center justify-between">
               <div>
                 <SheetTitle>Manage Events</SheetTitle>
@@ -112,15 +109,9 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                   Add, edit, or remove events for {tournament?.name || 'the tournament'}.
                 </SheetDescription>
               </div>
-              <SheetClose asChild>
-                 <Button variant="ghost" size="icon" className="rounded-full">
-                    <X className="h-5 w-5" />
-                    <span className="sr-only">Close</span>
-                  </Button>
-              </SheetClose>
             </div>
           </SheetHeader>
-          <div className="p-6 pt-0">
+          <div className="pt-4">
               <div className="flex justify-between items-center mb-4">
                   <span className="text-sm text-muted-foreground">
                       A list of events in this tournament.

@@ -6,19 +6,16 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetClose,
-  SheetFooter,
 } from '@/components/ui/sheet';
 import { Event } from './manage-events-sheet';
 import { EventForm } from './event-form';
-import { Button } from '@/components/ui/button';
 
 type EventSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'create' | 'edit';
   event: Event | null;
-  onSave: (data: Omit<Event, 'status'>) => void;
+  onSave: (data: Omit<Event, 'status' | 'id'> & { id?: number, status: Event['status'] }) => void;
 };
 
 export function EventSheet({ open, onOpenChange, mode, event, onSave }: EventSheetProps) {
