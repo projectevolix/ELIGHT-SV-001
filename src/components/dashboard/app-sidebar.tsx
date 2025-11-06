@@ -28,7 +28,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/tournaments', label: 'Tournaments', icon: Trophy },
-  { href: '/teams', label: 'Teams', icon: Users },
+  { href: '/associations', label: 'Associations', icon: Users },
   { href: '/schedule', label: 'Schedule', icon: Calendar },
   { href: '/standings', label: 'Standings', icon: BarChart4 },
 ];
