@@ -5,13 +5,14 @@ import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutGrid, List, Search, ChevronLeft, ChevronRight, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
+import { LayoutGrid, List, Search, ChevronLeft, ChevronRight, MoreVertical, Edit, Trash2, Eye, Settings } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TournamentSheet } from '@/components/tournaments/tournament-sheet';
+import { ManageEventsSheet } from '@/components/tournaments/manage-events-sheet';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -162,6 +163,7 @@ export default function TournamentsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [manageEventsSheetOpen, setManageEventsSheetOpen] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
@@ -231,6 +233,11 @@ export default function TournamentsPage() {
     setSheetMode('edit');
     setSelectedTournament(tournament);
     setSheetOpen(true);
+  };
+  
+  const handleManageEvents = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
+    setManageEventsSheetOpen(true);
   };
 
   const handleDeleteClick = (tournament: Tournament) => {
@@ -355,6 +362,11 @@ export default function TournamentsPage() {
                       <Edit className="mr-2 h-4 w-4" />
                       <span>Edit</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleManageEvents(tournament)}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Manage Events</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => handleDeleteClick(tournament)} className="text-destructive">
                       <Trash2 className="mr-2 h-4 w-4" />
                       <span>Delete</span>
@@ -406,6 +418,11 @@ export default function TournamentsPage() {
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleManageEvents(tournament)}}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Manage Events</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleDeleteClick(tournament)}} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Delete</span>
@@ -450,6 +467,11 @@ export default function TournamentsPage() {
         mode={sheetMode}
         tournament={selectedTournament}
         onSave={handleSave}
+      />
+      <ManageEventsSheet
+        open={manageEventsSheetOpen}
+        onOpenChange={setManageEventsSheetOpen}
+        tournament={selectedTournament}
       />
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent>
