@@ -313,7 +313,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
           name="admin"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Tournament Admin</FormLabel>
+              <FormLabel>Administrator</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -330,15 +330,15 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                         ? admins.find(
                             (admin) => admin.value === field.value
                           )?.label
-                        : "Select admin"}
+                        : "Select administrator"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder="Search admin..." />
-                    <CommandEmpty>No admin found.</CommandEmpty>
+                    <CommandInput placeholder="Search administrator..." />
+                    <CommandEmpty>No administrator found.</CommandEmpty>
                     <CommandGroup>
                       {admins.map((admin) => (
                         <CommandItem
