@@ -18,19 +18,19 @@ type Association = {
   province: string;
   email: string;
   phone: string;
-  website: string;
+  president: string;
   status: 'Active' | 'Inactive';
 };
 
 const initialAssociations: Association[] = [
-  { id: 1, name: 'Ontario Basketball', province: 'Ontario', email: 'info@basketball.on.ca', phone: '416-555-1234', website: 'basketball.on.ca', status: 'Active' },
-  { id: 2, name: 'BC Athletics', province: 'British Columbia', email: 'info@bcathletics.org', phone: '604-555-5678', website: 'bcathletics.org', status: 'Active' },
-  { id: 3, name: 'Alberta Soccer Association', province: 'Alberta', email: 'mail@albertasoccer.com', phone: '780-555-9012', website: 'albertasoccer.com', status: 'Inactive' },
-  { id: 4, name: 'Volleyball Québec', province: 'Québec', email: 'info@volleyball.qc.ca', phone: '514-555-3456', website: 'volleyball.qc.ca', status: 'Active' },
-  { id: 5, name: 'Saskatchewan Hockey', province: 'Saskatchewan', email: 'info@sha.sk.ca', phone: '306-555-7890', website: 'sha.sk.ca', status: 'Active' },
-  { id: 6, name: 'Manitoba Runners Association', province: 'Manitoba', email: 'contact@mra.mb.ca', phone: '204-555-1122', website: 'mra.mb.ca', status: 'Active' },
-  { id: 7, name: 'Tennis Newfoundland', province: 'Newfoundland and Labrador', email: 'admin@tennisnl.ca', phone: '709-555-3344', website: 'tennisnl.ca', status: 'Inactive' },
-  { id: 8, name: 'Swim Nova Scotia', province: 'Nova Scotia', email: 'office@swimnovascotia.com', phone: '902-555-5566', website: 'swimnovascotia.com', status: 'Active' },
+  { id: 1, name: 'Ontario Basketball', province: 'Ontario', email: 'info@basketball.on.ca', phone: '416-555-1234', president: 'John Doe', status: 'Active' },
+  { id: 2, name: 'BC Athletics', province: 'British Columbia', email: 'info@bcathletics.org', phone: '604-555-5678', president: 'Jane Smith', status: 'Active' },
+  { id: 3, name: 'Alberta Soccer Association', province: 'Alberta', email: 'mail@albertasoccer.com', phone: '780-555-9012', president: 'Mike Johnson', status: 'Inactive' },
+  { id: 4, name: 'Volleyball Québec', province: 'Québec', email: 'info@volleyball.qc.ca', phone: '514-555-3456', president: 'Emily Brown', status: 'Active' },
+  { id: 5, name: 'Saskatchewan Hockey', province: 'Saskatchewan', email: 'info@sha.sk.ca', phone: '306-555-7890', president: 'Chris Lee', status: 'Active' },
+  { id: 6, name: 'Manitoba Runners Association', province: 'Manitoba', email: 'contact@mra.mb.ca', phone: '204-555-1122', president: 'Patricia Williams', status: 'Active' },
+  { id: 7, name: 'Tennis Newfoundland', province: 'Newfoundland and Labrador', email: 'admin@tennisnl.ca', phone: '709-555-3344', president: 'Robert Davis', status: 'Inactive' },
+  { id: 8, name: 'Swim Nova Scotia', province: 'Nova Scotia', email: 'office@swimnovascotia.com', phone: '902-555-5566', president: 'Linda Martinez', status: 'Active' },
 ];
 
 const ITEMS_PER_PAGE = 5;
@@ -109,7 +109,7 @@ export default function AssociationsPage() {
                 <TableHead>Province</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
-                <TableHead>Website</TableHead>
+                <TableHead>President</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -126,9 +126,7 @@ export default function AssociationsPage() {
                   </TableCell>
                   <TableCell>{association.phone}</TableCell>
                   <TableCell>
-                     <a href={`https://${association.website}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      {association.website}
-                    </a>
+                     {association.president}
                   </TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(association.status)}>{association.status}</Badge>
