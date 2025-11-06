@@ -11,8 +11,11 @@ import { MoreVertical, Edit, Trash2, PlusCircle, Search, ChevronLeft, ChevronRig
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AssociationSheet } from '@/components/associations/association-sheet';
 
-type Association = {
+
+export type Association = {
   id: number;
   name: string;
   province: string;
@@ -40,6 +43,11 @@ export default function AssociationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedAssociation, setSelectedAssociation] = useState<Association | null>(null);
+  const [sheetMode, setSheetMode] = useState<'edit' | 'create'>('create');
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [associationToDelete, setAssociationToDelete] = useState<Association | null>(null);
 
   const getStatusVariant = (status: string) => {
     return status === 'Active' ? 'default' : 'outline';
@@ -60,6 +68,40 @@ export default function AssociationsPage() {
   }, [filteredAssociations, currentPage]);
 
   const totalPages = Math.ceil(filteredAssociations.length / ITEMS_PER_PAGE);
+
+  const handleCreate = () => {
+    setSheetMode('create');
+    setSelectedAssociation(null);
+    setSheetOpen(true);
+  };
+
+  const handleEdit = (association: Association) => {
+    setSheetMode('edit');
+    setSelectedAssociation(association);
+    setSheetOpen(true);
+  };
+
+  const handleDeleteClick = (association: Association) => {
+    setAssociationToDelete(association);
+    setDeleteAlertOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (associationToDelete) {
+      setAssociations(associations.filter(a => a.id !== associationToDelete.id));
+    }
+    setDeleteAlertOpen(false);
+    setAssociationToDelete(null);
+  };
+  
+  const handleSave = (data: Omit<Association, 'id'> & { id?: number }) => {
+    if (sheetMode === 'create') {
+      setAssociations([...associations, { ...data, id: Date.now() } as Association]);
+    } else {
+      setAssociations(associations.map(a => a.id === data.id ? { ...data, id: data.id } as Association : a));
+    }
+    setSheetOpen(false);
+  };
 
   return (
     <DashboardLayout>
@@ -93,7 +135,7 @@ export default function AssociationsPage() {
               <SelectItem value="Inactive">Inactive</SelectItem>
             </SelectContent>
           </Select>
-          <Button>
+          <Button onClick={handleCreate}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Association
           </Button>
@@ -139,12 +181,12 @@ export default function AssociationsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(association)}>
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem onClick={() => handleDeleteClick(association)} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Delete</span>
                         </DropdownMenuItem>
@@ -183,6 +225,28 @@ export default function AssociationsPage() {
           </Button>
         </div>
       )}
+      <AssociationSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        mode={sheetMode}
+        association={selectedAssociation}
+        onSave={handleSave}
+      />
+       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the association
+              and remove its data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
