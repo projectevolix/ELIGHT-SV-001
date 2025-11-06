@@ -143,7 +143,7 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
             <FormItem>
               <FormLabel>Weight Class</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Featherweight" {...field} />
+                <Input placeholder="50 - 60 kg" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
