@@ -171,12 +171,12 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
                                     <span>View</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleEditCoach(coach)}}>
-                                    <Edit className="h-4 w-4" />
+                                    <Edit className="mr-2 h-4 w-4" />
                                     <span>Edit</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleDeleteClick(coach)}} className="text-destructive">
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="mr-2 h-4 w-4" />
                                     <span>Delete</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
