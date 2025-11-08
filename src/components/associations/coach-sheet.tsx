@@ -14,20 +14,18 @@ import { CoachForm } from './coach-form';
 type CoachSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'view' | 'edit' | 'create';
+  mode: 'edit' | 'create';
   coach: Coach | null;
   onSave: (data: Omit<Coach, 'id'> & { id?: number }) => void;
 };
 
 export function CoachSheet({ open, onOpenChange, mode, coach, onSave }: CoachSheetProps) {
   const titles = {
-    view: 'Coach Details',
     edit: 'Edit Coach',
     create: 'Create New Coach',
   };
 
   const descriptions = {
-    view: "Here are the details for this coach.",
     edit: 'Update the details for this coach.',
     create: 'Fill out the form to create a new coach.',
   };

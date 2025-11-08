@@ -26,6 +26,8 @@ import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { CoachSheet } from './coach-sheet';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { CoachDetailsDialog } from './coach-details-dialog';
+
 
 export type Coach = {
   id: number;
@@ -57,6 +59,7 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [coachToDelete, setCoachToDelete] = useState<Coach | null>(null);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
 
   const handleCreateCoach = () => {
@@ -66,9 +69,8 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
   };
 
   const handleViewCoach = (coach: Coach) => {
-    setSheetMode('view');
     setSelectedCoach(coach);
-    setCoachSheetOpen(true);
+    setDetailsDialogOpen(true);
   };
 
   const handleEditCoach = (coach: Coach) => {
@@ -193,9 +195,14 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
       <CoachSheet 
         open={coachSheetOpen}
         onOpenChange={setCoachSheetOpen}
-        mode={sheetMode}
+        mode={sheetMode as 'edit' | 'create'}
         coach={selectedCoach}
         onSave={handleSaveCoach}
+      />
+      <CoachDetailsDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+        coach={selectedCoach}
       />
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent>
