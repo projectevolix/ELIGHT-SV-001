@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreVertical, Edit, Trash2, PlusCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, PlusCircle, Search, ChevronLeft, ChevronRight, UserCog, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AssociationSheet } from '@/components/associations/association-sheet';
@@ -158,6 +158,15 @@ export default function AssociationsPage() {
                         <DropdownMenuItem onClick={() => handleEdit(association)}>
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => {}}>
+                          <UserCog className="mr-2 h-4 w-4" />
+                          <span>Manage Coaches</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {}}>
+                          <Users className="mr-2 h-4 w-4" />
+                          <span>Manage Players</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => handleDeleteClick(association)} className="text-destructive">
