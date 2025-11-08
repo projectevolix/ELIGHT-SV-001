@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AssociationSheet } from '@/components/associations/association-sheet';
 import { ManageCoachesSheet } from '@/components/associations/manage-coaches-sheet';
+import { ManagePlayersSheet } from '@/components/associations/manage-players-sheet';
 
 
 export type Association = {
@@ -46,6 +47,7 @@ export default function AssociationsPage() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [associationToDelete, setAssociationToDelete] = useState<Association | null>(null);
   const [manageCoachesSheetOpen, setManageCoachesSheetOpen] = useState(false);
+  const [managePlayersSheetOpen, setManagePlayersSheetOpen] = useState(false);
 
   const filteredAssociations = useMemo(() => {
     return associations
@@ -99,6 +101,11 @@ export default function AssociationsPage() {
   const handleManageCoaches = (association: Association) => {
     setSelectedAssociation(association);
     setManageCoachesSheetOpen(true);
+  };
+
+  const handleManagePlayers = (association: Association) => {
+    setSelectedAssociation(association);
+    setManagePlayersSheetOpen(true);
   };
 
   return (
@@ -171,7 +178,7 @@ export default function AssociationsPage() {
                           <UserCog className="mr-2 h-4 w-4" />
                           <span>Manage Coaches</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {}}>
+                        <DropdownMenuItem onClick={() => handleManagePlayers(association)}>
                           <Users className="mr-2 h-4 w-4" />
                           <span>Manage Players</span>
                         </DropdownMenuItem>
@@ -225,6 +232,11 @@ export default function AssociationsPage() {
       <ManageCoachesSheet
         open={manageCoachesSheetOpen}
         onOpenChange={setManageCoachesSheetOpen}
+        association={selectedAssociation}
+      />
+      <ManagePlayersSheet
+        open={managePlayersSheetOpen}
+        onOpenChange={setManagePlayersSheetOpen}
         association={selectedAssociation}
       />
        <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
