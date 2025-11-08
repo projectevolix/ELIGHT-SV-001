@@ -22,17 +22,24 @@ import {
 import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X } from 'lucide-react';
 import { Association } from '@/app/associations/page';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { format } from 'date-fns';
 
 export type Coach = {
   id: number;
   firstName: string;
   lastName: string;
+  email: string;
+  dob: Date;
+  photoUrl?: string;
+  slkfId: string;
+  wkfId: string;
 };
 
 const initialCoaches: Coach[] = [
-  { id: 1, firstName: 'John', lastName: 'Doe' },
-  { id: 2, firstName: 'Jane', lastName: 'Smith' },
-  { id: 3, firstName: 'Mike', lastName: 'Johnson' },
+  { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', dob: new Date('1985-05-15'), slkfId: 'SLKF-001', wkfId: 'WKF-101', photoUrl: 'https://picsum.photos/seed/coach1/40/40' },
+  { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', dob: new Date('1990-08-22'), slkfId: 'SLKF-002', wkfId: 'WKF-102' },
+  { id: 3, firstName: 'Mike', lastName: 'Johnson', email: 'mike.johnson@example.com', dob: new Date('1978-11-30'), slkfId: 'SLKF-003', wkfId: 'WKF-103', photoUrl: 'https://picsum.photos/seed/coach3/40/40'  },
 ];
 
 type ManageCoachesSheetProps = {
@@ -59,7 +66,7 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
 
   return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="sm:max-w-4xl p-0">
+        <SheetContent className="sm:max-w-6xl p-0">
             <SheetHeader className="p-6">
                 <div className="flex items-center justify-between">
                 <div>
@@ -87,20 +94,33 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Photo</TableHead>
                     <TableHead>First Name</TableHead>
                     <TableHead>Last Name</TableHead>
-                    <TableHead>Photo</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Date of Birth</TableHead>
+                    <TableHead>SLKF ID</TableHead>
+                    <TableHead>WKF ID</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {coaches.map((coach) => (
                     <TableRow key={coach.id}>
+                        <TableCell>
+                            <Avatar className="h-8 w-8">
+                                {coach.photoUrl ? <AvatarImage src={coach.photoUrl} alt={`${coach.firstName} ${coach.lastName}`} /> : null}
+                                <AvatarFallback>
+                                    <UserCircle className="h-6 w-6 text-muted-foreground" />
+                                </AvatarFallback>
+                            </Avatar>
+                      </TableCell>
                       <TableCell className="font-medium">{coach.firstName}</TableCell>
                       <TableCell>{coach.lastName}</TableCell>
-                      <TableCell>
-                        <UserCircle className="h-6 w-6 text-muted-foreground" />
-                      </TableCell>
+                      <TableCell>{coach.email}</TableCell>
+                      <TableCell>{format(coach.dob, 'MMM d, yyyy')}</TableCell>
+                      <TableCell>{coach.slkfId}</TableCell>
+                      <TableCell>{coach.wkfId}</TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="icon" onClick={() => handleEditCoach(coach)}>
                             <Edit className="h-4 w-4" />
