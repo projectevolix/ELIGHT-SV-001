@@ -147,14 +147,14 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
-                      captionLayout="dropdown-buttons"
-                      fromYear={1900}
-                      toYear={new Date().getFullYear()}
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
                       disabled={(date) => isViewMode || date > new Date() || date < new Date("1900-01-01")}
                       initialFocus
+                      captionLayout="dropdown-nav"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear()}
                     />
                   </PopoverContent>
                 </Popover>
@@ -201,7 +201,7 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
               {isViewMode ? (
                 imagePreview ? (
                     <div className="relative w-32 h-32">
-                        <Image src={imagePreview} alt="Player Photo" layout="fill" objectFit="cover" className="rounded-lg" />
+                        <Image src={imagePreview} alt="Player Photo" fill objectFit="cover" className="rounded-lg" />
                     </div>
                 ) : <p className="text-sm text-muted-foreground">No photo.</p>
               ) : (
@@ -213,7 +213,7 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
                     >
                       {imagePreview ? (
                         <div className="relative w-full h-full">
-                           <Image src={imagePreview} alt="Photo Preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                           <Image src={imagePreview} alt="Photo Preview" fill objectFit="cover" className="rounded-lg" />
                            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
                               Click or drag file to replace
                            </div>

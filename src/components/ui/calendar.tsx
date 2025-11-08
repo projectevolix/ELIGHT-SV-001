@@ -3,10 +3,11 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import { DayPicker, DropdownProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -56,12 +57,45 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        Dropdown: (props: DropdownProps) => {
+            const handleCalendarChange = (
+              value: string,
+            ) => {
+              const newDate = new Date(props.value as Date);
+              if (props.name === "months") {
+                newDate.setMonth(parseInt(value));
+              } else if (props.name === "years") {
+                newDate.setFullYear(parseInt(value));
+              }
+              props.onChange?.(newDate);
+            };
+
+            return (
+              <Select
+                value={String(props.value)}
+                onValueChange={(value) => {
+                  handleCalendarChange(value);
+                }}
+              >
+                <SelectTrigger className="h-8 w-fit font-medium pr-1.5 first:w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
+                  {props.options?.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={String(option.value)}
+                      disabled={option.disabled}
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )
+          },
       }}
       {...props}
     />
