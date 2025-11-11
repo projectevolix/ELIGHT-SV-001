@@ -20,6 +20,7 @@ import {
   Shield,
   Settings,
   Trophy,
+  ClipboardEdit,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/tournaments', label: 'Tournaments', icon: Trophy },
   { href: '/associations', label: 'Associations', icon: Users },
-  { href: '/schedule', label: 'Schedule', icon: Calendar },
+  { href: '/registration', label: 'Registration', icon: ClipboardEdit },
   { href: '/standings', label: 'Standings', icon: BarChart4 },
 ];
 
