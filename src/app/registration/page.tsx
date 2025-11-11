@@ -1,62 +1,100 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Check, ChevronsUpDown, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { PlusCircle } from 'lucide-react';
+import { RegistrationSheet } from '@/components/registration/registration-sheet';
 
-
-// Mock data - replace with actual data fetching
+// Mock data
 const tournaments = [
-  { id: 1, name: 'Summer Championship 2024' },
-  { id: 2, name: 'The International 2024' },
-  { id: 3, name: 'Masters Tokyo' },
-];
-
-const allPlayers = [
-  { id: 1, name: 'Kasun Perera' },
-  { id: 2, name: 'John Doe' },
-  { id: 3, name: 'Jane Smith' },
-  { id: 4, name: 'Alice Williams' },
-  { id: 5, name: 'Bob Brown' },
+  { id: '1', name: 'Summer Championship 2024' },
+  { id: '2', name: 'The International 2024' },
+  { id: '3', name: 'Masters Tokyo' },
 ];
 
 const events = [
-    { id: 1, name: 'U19 - Male - Singles (58 - 68 kg)' },
-    { id: 2, name: 'U19 - Female - Doubles (53 - 57 kg)' },
-    { id: 3, name: 'Senior - Mixed - Mixed Doubles (90+ kg)' },
+    { id: '1', name: 'U19 - Male - Singles (58 - 68 kg)', tournamentId: '1' },
+    { id: '2', name: 'U19 - Female - Doubles (53 - 57 kg)', tournamentId: '1' },
+    { id: '3', name: 'Senior - Mixed - Mixed Doubles (90+ kg)', tournamentId: '2' },
 ];
 
-export default function RegistrationPage() {
-  const [selectedTournament, setSelectedTournament] = useState<string | undefined>(undefined);
-  const [selectedPlayers, setSelectedPlayers] = useState<{ id: number, name: string }[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<string | undefined>(undefined);
-  const [openPlayersPopover, setOpenPlayersPopover] = useState(false);
+type Registration = {
+    id: number;
+    playerName: string;
+    tournamentId: string;
+    eventId: string;
+    status: 'Pending' | 'Approved' | 'Declined';
+};
 
-  const handlePlayerSelect = (player: { id: number, name: string }) => {
-    setSelectedPlayers(prev => 
-      prev.find(p => p.id === player.id) 
-        ? prev.filter(p => p.id !== player.id)
-        : [...prev, player]
-    );
+const initialRegistrations: Registration[] = [
+    { id: 1, playerName: 'Nipun Silva', tournamentId: '1', eventId: '1', status: 'Pending' },
+    { id: 2, playerName: 'John Doe', tournamentId: '1', eventId: '1', status: 'Approved' },
+    { id: 3, playerName: 'Jane Smith', tournamentId: '1', eventId: '2', status: 'Pending' },
+    { id: 4, playerName: 'Alice Williams', tournamentId: '2', eventId: '3', status: 'Approved' },
+    { id: 5, playerName: 'Bob Brown', tournamentId: '2', eventId: '3', status: 'Declined' },
+    { id: 6, playerName: 'Kasun Perera', tournamentId: '1', eventId: '1', status: 'Approved' },
+];
+
+
+export default function RegistrationPage() {
+  const [registrations, setRegistrations] = useState<Registration[]>(initialRegistrations);
+  const [filteredTournament, setFilteredTournament] = useState<string>('all');
+  const [filteredEvent, setFilteredEvent] = useState<string>('all');
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const availableEvents = useMemo(() => {
+    if (filteredTournament === 'all') {
+      return events;
+    }
+    return events.filter(e => e.tournamentId === filteredTournament);
+  }, [filteredTournament]);
+  
+  const filteredRegistrations = useMemo(() => {
+    return registrations.filter(r => {
+        const tournamentMatch = filteredTournament === 'all' || r.tournamentId === filteredTournament;
+        const eventMatch = filteredEvent === 'all' || r.eventId === filteredEvent;
+        return tournamentMatch && eventMatch;
+    });
+  }, [registrations, filteredTournament, filteredEvent]);
+
+  const approvedCount = useMemo(() => {
+    return filteredRegistrations.filter(r => r.status === 'Approved').length;
+  }, [filteredRegistrations]);
+  
+  const handleStatusChange = (id: number, status: 'Approved' | 'Declined') => {
+    setRegistrations(prev => prev.map(r => r.id === id ? {...r, status} : r));
   };
   
-  const handlePlayerRemove = (playerId: number) => {
-    setSelectedPlayers(prev => prev.filter(p => p.id !== playerId));
+  const handleSaveRegistration = (data: any) => {
+    console.log('New Registration:', data);
+     const newRegistration: Registration = {
+      id: Date.now(),
+      playerName: `Player ${Date.now()}`,
+      tournamentId: data.tournamentId,
+      eventId: data.eventId,
+      status: 'Pending',
+    };
+    // In a real app, you would get the player name from the data
+    // For now, we add a placeholder.
+    setRegistrations(prev => [newRegistration, ...prev]);
+    setSheetOpen(false);
+  };
+  
+  const getStatusVariant = (status: Registration['status']) => {
+    switch (status) {
+        case 'Approved': return 'secondary';
+        case 'Pending': return 'default';
+        case 'Declined': return 'destructive';
+        default: return 'outline';
+    }
   };
 
-  const handleReset = () => {
-    setSelectedTournament(undefined);
-    setSelectedPlayers([]);
-    setSelectedEvent(undefined);
-  };
 
   return (
     <DashboardLayout>
@@ -64,109 +102,99 @@ export default function RegistrationPage() {
         <h1 className="text-3xl font-bold font-headline tracking-tight">
           Registration
         </h1>
+        <Button onClick={() => setSheetOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Register Player
+        </Button>
       </div>
 
-      <div className="flex justify-center pt-8">
-        <Card className="w-full max-w-2xl shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline">Registration Form</CardTitle>
-            <CardDescription>Fill out the form to register players for a tournament event.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tournament</label>
-                 <Select value={selectedTournament} onValueChange={setSelectedTournament}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a tournament" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tournaments.map(t => (
-                      <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Players</label>
-                <Popover open={openPlayersPopover} onOpenChange={setOpenPlayersPopover}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openPlayersPopover}
-                      className="w-full justify-between font-normal"
-                    >
-                      {selectedPlayers.length > 0 ? `${selectedPlayers.length} selected` : 'Select players...'}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search players..." />
-                      <CommandList>
-                        <CommandEmpty>No players found.</CommandEmpty>
-                        <CommandGroup>
-                          {allPlayers.map((player) => (
-                            <CommandItem
-                              key={player.id}
-                              onSelect={() => handlePlayerSelect(player)}
-                              value={player.name}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  selectedPlayers.find(p => p.id === player.id) ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {player.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <div className="pt-2 flex flex-wrap gap-2">
-                  {selectedPlayers.map(player => (
-                    <Badge key={player.id} variant="secondary" className="pl-2 pr-1">
-                      {player.name}
-                      <button 
-                        type="button" 
-                        onClick={() => handlePlayerRemove(player.id)}
-                        className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
-                        aria-label={`Remove ${player.name}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="font-headline">Registered Players</CardTitle>
+          <CardDescription>View and manage player registrations.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="flex items-center gap-4 mb-6 flex-wrap">
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium">Tournament</label>
+                    <Select value={filteredTournament} onValueChange={setFilteredTournament}>
+                        <SelectTrigger className="w-[240px]">
+                            <SelectValue placeholder="All Tournaments" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Tournaments</SelectItem>
+                            {tournaments.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                 </div>
-              </div>
+                 <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium">Event</label>
+                    <Select value={filteredEvent} onValueChange={setFilteredEvent} disabled={availableEvents.length === 0}>
+                        <SelectTrigger className="w-[240px]">
+                            <SelectValue placeholder="All Events" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Events</SelectItem>
+                            {availableEvents.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="ml-auto">
+                    <Button>Publish Event</Button>
+                </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Event</label>
-                <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an event" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {events.map(e => (
-                      <SelectItem key={e.id} value={String(e.id)}>{e.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex justify-end gap-4 pt-4">
-                 <Button type="button" variant="outline" onClick={handleReset}>Reset</Button>
-                 <Button type="submit" onClick={(e) => e.preventDefault()}>Save Registration</Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="border rounded-lg">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Player</TableHead>
+                            <TableHead>Tournament</TableHead>
+                            <TableHead>Event</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredRegistrations.map(reg => (
+                            <TableRow key={reg.id}>
+                                <TableCell className="font-medium">{reg.playerName}</TableCell>
+                                <TableCell>{tournaments.find(t => t.id === reg.tournamentId)?.name}</TableCell>
+                                <TableCell>{events.find(e => e.id === reg.eventId)?.name}</TableCell>
+                                <TableCell>
+                                    <Badge variant={getStatusVariant(reg.status)}>{reg.status}</Badge>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex gap-2 justify-end">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => handleStatusChange(reg.id, 'Approved')}
+                                            disabled={reg.status === 'Approved'}
+                                        >
+                                            Approve
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+                                            onClick={() => handleStatusChange(reg.id, 'Declined')}
+                                        >
+                                            Decline
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4">
+                Approved players in the current filter: {approvedCount}
+            </p>
+        </CardContent>
+      </Card>
+      <RegistrationSheet open={sheetOpen} onOpenChange={setSheetOpen} onSave={handleSaveRegistration} />
     </DashboardLayout>
   );
 }
