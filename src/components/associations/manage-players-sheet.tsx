@@ -104,7 +104,7 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="sm:max-w-6xl p-0">
+        <SheetContent showCloseButton={false} className="sm:max-w-6xl p-0">
             <SheetHeader className="p-6">
                 <div className="flex items-center justify-between">
                 <div>
