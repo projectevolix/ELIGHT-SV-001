@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useEffect } from 'react';
-import type { Association } from '@/app/associations/page';
+import type { Association } from '@/types/api/associations';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required.'),
@@ -28,7 +28,7 @@ const formSchema = z.object({
 type AssociationFormProps = {
   mode: 'create' | 'edit';
   association: Association | null;
-  onSave: (data: Omit<Association, 'id'> & { id?: number }) => void;
+  onSave: (data: Omit<Association, 'id' | 'createdAt' | 'updatedAt'> & { id?: string | number }) => void;
   onCancel: () => void;
 };
 
@@ -79,7 +79,7 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="province"
@@ -107,39 +107,39 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
             </FormItem>
           )}
         />
-        
+
         <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. 416-555-1234" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="president"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>President</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. 416-555-1234" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="president"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>President</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. John Doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-        
+
         <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-            <Button type="submit">Save</Button>
+          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
     </Form>

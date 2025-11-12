@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import type { Association } from '@/app/associations/page';
+import type { Association } from '@/types/api/associations';
 import { AssociationForm } from './association-form';
 
 type AssociationSheetProps = {
@@ -16,7 +16,7 @@ type AssociationSheetProps = {
   onOpenChange: (open: boolean) => void;
   mode: 'edit' | 'create';
   association: Association | null;
-  onSave: (data: Omit<Association, 'id'> & { id?: number }) => void;
+  onSave: (data: Omit<Association, 'id' | 'createdAt' | 'updatedAt'> & { id?: string | number }) => void;
 };
 
 export function AssociationSheet({ open, onOpenChange, mode, association, onSave }: AssociationSheetProps) {
@@ -38,12 +38,12 @@ export function AssociationSheet({ open, onOpenChange, mode, association, onSave
           <SheetDescription>{descriptions[mode]}</SheetDescription>
         </SheetHeader>
         <div className="py-8">
-            <AssociationForm
-                mode={mode}
-                association={association} 
-                onSave={onSave}
-                onCancel={() => onOpenChange(false)} 
-            />
+          <AssociationForm
+            mode={mode}
+            association={association}
+            onSave={onSave}
+            onCancel={() => onOpenChange(false)}
+          />
         </div>
       </SheetContent>
     </Sheet>
