@@ -15,12 +15,13 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
-  BarChart4,
+  BarChart2,
   User,
   Shield,
   Settings,
   Trophy,
   ClipboardEdit,
+  GitBranch,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,8 @@ const menuItems = [
   { href: '/tournaments', label: 'Tournaments', icon: Trophy },
   { href: '/associations', label: 'Associations', icon: Users },
   { href: '/registration', label: 'Registration', icon: ClipboardEdit },
-  { href: '/standings', label: 'Standings', icon: BarChart4 },
+  { href: '/draws', label: 'Draws', icon: GitBranch },
+  { href: '/player-rankings', label: 'Player Rankings', icon: BarChart2 },
 ];
 
 export function AppSidebar() {
