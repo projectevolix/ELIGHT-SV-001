@@ -35,14 +35,16 @@ export type Event = {
   gender: 'Male' | 'Female' | 'Mixed';
   weightClass: string;
   status: 'Upcoming' | 'Ongoing' | 'Finished';
+  eventType: 'Individual' | 'Team';
+  teamSize?: number;
 };
 
 const initialEvents: Event[] = [
-  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', weightClass: '58 - 68 kg', status: 'Upcoming' },
-  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', weightClass: '53 - 57 kg', status: 'Ongoing' },
-  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', weightClass: '90+ kg', status: 'Finished' },
-  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', weightClass: '68 - 80 kg', status: 'Upcoming' },
-  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', weightClass: '49 - 53 kg', status: 'Finished' },
+  { id: 1, discipline: 'Singles', ageCategory: 'U19', gender: 'Male', weightClass: '58 - 68 kg', status: 'Upcoming', eventType: 'Individual' },
+  { id: 2, discipline: 'Doubles', ageCategory: 'U19', gender: 'Female', weightClass: '53 - 57 kg', status: 'Ongoing', eventType: 'Team', teamSize: 2 },
+  { id: 3, discipline: 'Mixed Doubles', ageCategory: 'Senior', gender: 'Mixed', weightClass: '90+ kg', status: 'Finished', eventType: 'Team', teamSize: 2 },
+  { id: 4, discipline: 'Singles', ageCategory: 'U15', gender: 'Male', weightClass: '68 - 80 kg', status: 'Upcoming', eventType: 'Individual' },
+  { id: 5, discipline: 'Singles', ageCategory: 'U15', gender: 'Female', weightClass: '49 - 53 kg', status: 'Finished', eventType: 'Individual' },
 ];
 
 type ManageEventsSheetProps = {
@@ -130,6 +132,7 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                     <TableHead>Age Category</TableHead>
                     <TableHead>Gender</TableHead>
                     <TableHead>Weight Class</TableHead>
+                    <TableHead>Event Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -141,6 +144,9 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                       <TableCell>{event.ageCategory}</TableCell>
                       <TableCell>{event.gender}</TableCell>
                       <TableCell>{event.weightClass}</TableCell>
+                       <TableCell>
+                        {event.eventType === 'Team' ? `Team (${event.teamSize} members)` : 'Individual'}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(event.status)}>{event.status}</Badge>
                       </TableCell>

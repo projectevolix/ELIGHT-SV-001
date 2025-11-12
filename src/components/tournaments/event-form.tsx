@@ -23,7 +23,18 @@ const formSchema = z.object({
   gender: z.enum(['Male', 'Female', 'Mixed']),
   weightClass: z.string().min(2, 'Weight class is required.'),
   status: z.enum(['Upcoming', 'Ongoing', 'Finished']),
+  eventType: z.enum(['Individual', 'Team'], { required_error: 'Event type is required.' }),
+  teamSize: z.coerce.number().optional(),
+}).refine(data => {
+    if (data.eventType === 'Team') {
+        return data.teamSize && data.teamSize > 0;
+    }
+    return true;
+}, {
+    message: 'Team size must be a positive number for team events.',
+    path: ['teamSize'],
 });
+
 
 type EventFormProps = {
   mode: 'create' | 'edit';
@@ -41,9 +52,13 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
         gender: 'Male',
         weightClass: '',
         status: 'Upcoming',
+        eventType: 'Individual',
+        teamSize: undefined,
         ...event,
     },
   });
+
+  const eventType = form.watch('eventType');
 
   useEffect(() => {
     form.reset({
@@ -52,13 +67,19 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
         gender: 'Male',
         weightClass: '',
         status: 'Upcoming',
+        eventType: 'Individual',
+        teamSize: undefined,
         ...event,
     });
   }, [event, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    const dataToSave = { ...values };
+    if (dataToSave.eventType === 'Individual') {
+        delete dataToSave.teamSize;
+    }
     onSave({
-      ...values,
+      ...dataToSave,
       id: event?.id,
     });
   }
@@ -149,6 +170,44 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
             </FormItem>
           )}
         />
+        
+        <FormField
+          control={form.control}
+          name="eventType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Event Type</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Individual">Individual</SelectItem>
+                  <SelectItem value="Team">Team</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {eventType === 'Team' && (
+            <FormField
+              control={form.control}
+              name="teamSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of Members</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g. 5" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+        )}
 
         <FormField
           control={form.control}
