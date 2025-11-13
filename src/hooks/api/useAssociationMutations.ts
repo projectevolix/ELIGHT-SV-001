@@ -104,7 +104,16 @@ export function useDeleteAssociation() {
   return useMutation({
     mutationFn: (id: string | number) => deleteAssociation(id),
     onSuccess: (_, deletedId: string | number) => {
-      // Invalidate all association queries
+      // Immediately update cache by removing the deleted association
+      // This prevents the "not found" error from a second call
+      queryClient.setQueryData(associationKeys.lists(), (oldData: any) => {
+        if (Array.isArray(oldData)) {
+          return oldData.filter((assoc: any) => assoc.id !== deletedId);
+        }
+        return oldData;
+      });
+
+      // Invalidate all association queries to refetch if needed
       const invalidationKeys = getAssociationInvalidationKeys(deletedId);
       for (const key of invalidationKeys) {
         queryClient.invalidateQueries({ queryKey: key as any });

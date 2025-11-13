@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { useLogin } from '@/hooks/api/useAuth';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address.'),
@@ -24,6 +26,9 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
+  const router = useRouter();
+  const { mutate: login, isPending } = useLogin();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,8 +38,15 @@ export function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle login logic here
+    login(
+      { email: values.email, password: values.password },
+      {
+        onSuccess: () => {
+          // Redirect to dashboard after successful login
+          router.push('/');
+        },
+      }
+    );
   }
 
   return (
@@ -68,16 +80,16 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-             <Button type="submit" className="w-full">
-                Sign In
-             </Button>
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? 'Signing in...' : 'Sign In'}
+            </Button>
           </CardContent>
           <CardFooter className="flex justify-center text-sm">
-             <p className="text-muted-foreground">
-                Don't have an account?{' '}
-                <Link href="/signup" className="text-primary hover:underline">
-                    Sign up
-                </Link>
+            <p className="text-muted-foreground">
+              Don't have an account?{' '}
+              <Link href="/signup" className="text-primary hover:underline">
+                Sign up
+              </Link>
             </p>
           </CardFooter>
         </form>

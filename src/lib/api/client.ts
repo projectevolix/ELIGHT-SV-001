@@ -125,6 +125,11 @@ class ApiClient {
         signal: abortController.signal,
       });
 
+      // Handle 204 No Content (successful deletion with no body)
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
       // Parse response
       let data: ApiResponse<T> | T;
       const contentType = response.headers.get("content-type");

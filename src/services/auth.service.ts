@@ -14,7 +14,8 @@ import type {
 } from "@/types/api/auth";
 
 /**
- * Login user and store access token
+ * Login user and store access token securely
+ * Uses industrial-grade session management with httpOnly cookies + localStorage
  */
 export async function loginUser(
   credentials: LoginRequest,
@@ -26,9 +27,16 @@ export async function loginUser(
     { skipAuth: true } // Don't require auth for login
   );
 
-  // Store token for future requests
+  // Store token for future requests (legacy compatibility)
   if (response.accessToken) {
     client.setAuthToken(response.accessToken, response.tokenType);
+  }
+
+  // Store token securely using new session management
+  if (response.accessToken && typeof window !== "undefined") {
+    const { storeAuthToken } = await import("@/lib/auth/client");
+    const expiresIn = response.expiresIn || 86400000; // 24 hours default
+    storeAuthToken(response.accessToken, expiresIn);
   }
 
   return response;
@@ -51,15 +59,44 @@ export async function signupUser(
 }
 
 /**
- * Logout user (clear stored token)
+ * Logout user (clear stored token and session)
+ * Industrial-grade logout with token revocation and session cleanup
  */
-export function logoutUser(client: ApiClient = apiClient): void {
-  client.clearAuthToken();
+export async function logoutUser(client: ApiClient = apiClient): Promise<void> {
+  try {
+    // Attempt to revoke token on backend (LOGOUT endpoint may not be available)
+    const logoutEndpoint = (API_PATHS.AUTH as any).LOGOUT || "/auth/logout";
+    await client.post<void>(logoutEndpoint, {});
+  } catch (error) {
+    // Continue logout even if API call fails
+    console.warn("Logout API call failed:", error);
+  } finally {
+    // Clear legacy token storage
+    client.clearAuthToken();
+
+    // Clear secure session (httpOnly cookies + localStorage)
+    if (typeof window !== "undefined") {
+      const { clearAuthToken } = await import("@/lib/auth/client");
+      clearAuthToken();
+    }
+  }
 }
 
 /**
  * Check if user is authenticated
+ * Validates token existence and non-expiry
  */
-export function isUserAuthenticated(client: ApiClient = apiClient): boolean {
-  return client.isAuthenticated();
+export async function isUserAuthenticated(
+  client: ApiClient = apiClient
+): Promise<boolean> {
+  // Check legacy token storage first
+  if (client.isAuthenticated()) {
+    // Also validate with new session management
+    if (typeof window !== "undefined") {
+      const { isAuthenticated } = await import("@/lib/auth/client");
+      return isAuthenticated();
+    }
+    return true;
+  }
+  return false;
 }

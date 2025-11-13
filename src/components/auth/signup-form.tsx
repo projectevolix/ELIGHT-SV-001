@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { useSignup } from '@/hooks/api/useAuth';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -25,6 +27,9 @@ const formSchema = z.object({
 });
 
 export function SignupForm() {
+  const router = useRouter();
+  const { mutate: signup, isPending } = useSignup();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,15 +40,22 @@ export function SignupForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle signup logic here
+    signup(
+      { name: values.name, email: values.email, password: values.password },
+      {
+        onSuccess: () => {
+          // Redirect to login after successful signup
+          router.push('/login');
+        },
+      }
+    );
   }
 
   return (
     <Card>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-           <CardContent className="space-y-6 pt-6">
+          <CardContent className="space-y-6 pt-6">
             <FormField
               control={form.control}
               name="name"
@@ -83,16 +95,16 @@ export function SignupForm() {
                 </FormItem>
               )}
             />
-             <Button type="submit" className="w-full">
-                Create Account
-             </Button>
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? 'Creating account...' : 'Create Account'}
+            </Button>
           </CardContent>
-           <CardFooter className="flex justify-center text-sm">
-             <p className="text-muted-foreground">
-                Already have an account?{' '}
-                <Link href="/login" className="text-primary hover:underline">
-                    Sign in
-                </Link>
+          <CardFooter className="flex justify-center text-sm">
+            <p className="text-muted-foreground">
+              Already have an account?{' '}
+              <Link href="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
             </p>
           </CardFooter>
         </form>

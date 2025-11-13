@@ -18,6 +18,7 @@ export const API_PATHS = {
   AUTH: {
     LOGIN: "/auth/login",
     SIGNUP: "/auth/signup",
+    LOGOUT: "/auth/logout",
   },
   ASSOCIATIONS: {
     LIST: "/associations",

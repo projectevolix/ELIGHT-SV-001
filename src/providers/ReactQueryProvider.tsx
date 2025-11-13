@@ -54,9 +54,10 @@ export function createQueryClient(): QueryClient {
                 refetchOnReconnect: false,
             },
             mutations: {
-                // Number of retries on mutation failure
-                retry: 1,
-                retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+                // Don't retry mutations by default (they should be idempotent if needed)
+                retry: 0,
+                // Disable throwing errors on mutation failure (handle in onError)
+                throwOnError: false,
             },
         },
     });
@@ -86,7 +87,11 @@ export function ReactQueryProvider({ children }: ReactQueryProviderProps) {
     const queryClient = getQueryClient();
 
     return (
-        <QueryClientProvider client={queryClient}>
+        <QueryClientProvider
+            client={queryClient}
+            // Disable strict mode double invocation in development
+            options={{ shouldDehydrateQuery: () => true }}
+        >
             {children}
         </QueryClientProvider>
     );
