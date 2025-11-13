@@ -1,6 +1,6 @@
 'use client';
 
-import { Tournament } from '@/app/tournaments/page';
+import { Tournament } from '@/app/(root)/tournaments/page';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Shield, Trophy, Users, User, Clock } from 'lucide-react';
 import { format } from 'date-fns';
@@ -47,30 +47,30 @@ export function TournamentDetails({ tournament }: TournamentDetailsProps) {
         <DetailItem icon={Trophy} label="Name" value={tournament.name} />
         <DetailItem icon={Shield} label="Grade" value={tournament.grade} />
         <DetailItem icon={MapPin} label="Venue" value={tournament.venue} />
-        <DetailItem 
-          icon={Users} 
-          label="Status" 
+        <DetailItem
+          icon={Users}
+          label="Status"
           value={<Badge variant={getStatusVariant(tournament.status)}>{tournament.status}</Badge>}
         />
-        <DetailItem 
-          icon={Calendar} 
-          label="Start Date" 
-          value={format(new Date(tournament.startDate), 'MMM d, yyyy')} 
+        <DetailItem
+          icon={Calendar}
+          label="Start Date"
+          value={format(new Date(tournament.startDate), 'MMM d, yyyy')}
         />
-        <DetailItem 
-          icon={Calendar} 
-          label="End Date" 
-          value={format(new Date(tournament.endDate), 'MMM d, yyyy')} 
+        <DetailItem
+          icon={Calendar}
+          label="End Date"
+          value={format(new Date(tournament.endDate), 'MMM d, yyyy')}
         />
-         <DetailItem 
-          icon={Clock} 
-          label="Registration Starts" 
-          value={format(new Date(tournament.registrationStartDate), 'MMM d, yyyy')} 
+        <DetailItem
+          icon={Clock}
+          label="Registration Starts"
+          value={format(new Date(tournament.registrationStartDate), 'MMM d, yyyy')}
         />
-        <DetailItem 
-          icon={Clock} 
-          label="Registration Ends" 
-          value={format(new Date(tournament.registrationEndDate), 'MMM d, yyyy')} 
+        <DetailItem
+          icon={Clock}
+          label="Registration Ends"
+          value={format(new Date(tournament.registrationEndDate), 'MMM d, yyyy')}
         />
         <DetailItem icon={User} label="Administrator" value={tournament.admin} />
       </div>

@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye } from 'lucide-react';
-import { Association } from '@/app/associations/page';
+import { Association } from '@/app/(root)/associations/page';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -105,28 +105,28 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent showCloseButton={false} className="sm:max-w-6xl p-0">
-            <SheetHeader className="p-6">
-                <div className="flex items-center justify-between">
-                <div>
-                    <SheetTitle>Manage Players</SheetTitle>
-                    <SheetDescription>
-                    Manage players for {association?.name || 'the selected association'}.
-                    </SheetDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button onClick={handleCreatePlayer}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Create Player
-                    </Button>
-                    <SheetClose asChild>
-                       <Button variant="outline" size="icon">
-                        <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
-                       </Button>
-                    </SheetClose>
-                </div>
-                </div>
-            </SheetHeader>
+          <SheetHeader className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <SheetTitle>Manage Players</SheetTitle>
+                <SheetDescription>
+                  Manage players for {association?.name || 'the selected association'}.
+                </SheetDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button onClick={handleCreatePlayer}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Player
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline" size="icon">
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Close</span>
+                  </Button>
+                </SheetClose>
+              </div>
+            </div>
+          </SheetHeader>
           <div className="px-6 pb-6">
             <div className="border rounded-lg">
               <Table>
@@ -144,13 +144,13 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
                 <TableBody>
                   {players.map((player) => (
                     <TableRow key={player.id} onClick={() => handleViewPlayer(player)} className="cursor-pointer">
-                        <TableCell>
-                            <Avatar className="h-8 w-8">
-                                {player.photoUrl ? <AvatarImage src={player.photoUrl} alt={`${player.firstName} ${player.lastName}`} data-ai-hint="person face" /> : null}
-                                <AvatarFallback>
-                                    <UserCircle className="h-6 w-6 text-muted-foreground" />
-                                </AvatarFallback>
-                            </Avatar>
+                      <TableCell>
+                        <Avatar className="h-8 w-8">
+                          {player.photoUrl ? <AvatarImage src={player.photoUrl} alt={`${player.firstName} ${player.lastName}`} data-ai-hint="person face" /> : null}
+                          <AvatarFallback>
+                            <UserCircle className="h-6 w-6 text-muted-foreground" />
+                          </AvatarFallback>
+                        </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">{player.firstName}</TableCell>
                       <TableCell>{player.lastName}</TableCell>
@@ -159,26 +159,26 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
                       <TableCell>{player.kyuId}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleViewPlayer(player)}}>
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    <span>View</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleEditPlayer(player)}}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    <span>Edit</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleDeleteClick(player)}} className="text-destructive">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    <span>Delete</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewPlayer(player) }}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span>View</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditPlayer(player) }}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(player) }} className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
@@ -189,7 +189,7 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
           </div>
         </SheetContent>
       </Sheet>
-      <PlayerSheet 
+      <PlayerSheet
         open={playerSheetOpen}
         onOpenChange={setPlayerSheetOpen}
         mode={sheetMode as 'edit' | 'create'}
@@ -203,17 +203,17 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
       />
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the player
-                    and remove their data from our servers.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
-            </AlertDialogFooter>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the player
+              and remove their data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>

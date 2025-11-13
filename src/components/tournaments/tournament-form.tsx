@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Tournament } from '@/app/tournaments/page';
+import { Tournament } from '@/app/(root)/tournaments/page';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
@@ -73,7 +73,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
       ...tournament,
     },
   });
-  
+
   useEffect(() => {
     const defaultValues = {
       name: '',
@@ -146,7 +146,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="venue"
@@ -160,7 +160,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
             </FormItem>
           )}
         />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -223,7 +223,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                       disabled={(date) => isViewMode || date < (form.getValues('registrationStartDate') || new Date("1900-01-01"))}
+                      disabled={(date) => isViewMode || date < (form.getValues('registrationStartDate') || new Date("1900-01-01"))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -328,8 +328,8 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                     >
                       {field.value
                         ? admins.find(
-                            (admin) => admin.value === field.value
-                          )?.label
+                          (admin) => admin.value === field.value
+                        )?.label
                         : "Select administrator"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -359,7 +359,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="bannerUrl"
@@ -370,17 +370,17 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                 imagePreview ? null : <p className="text-sm text-muted-foreground">No banner image.</p>
               ) : (
                 <FormControl>
-                   <div className="flex flex-col items-center justify-center w-full">
+                  <div className="flex flex-col items-center justify-center w-full">
                     <label
                       htmlFor="dropzone-file"
                       className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
                     >
                       {imagePreview ? (
                         <div className="relative w-full h-full">
-                           <Image src={imagePreview} alt="Banner Preview" layout="fill" objectFit="cover" className="rounded-lg" />
-                           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
-                              Click or drag file to replace
-                           </div>
+                          <Image src={imagePreview} alt="Banner Preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
+                            Click or drag file to replace
+                          </div>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -396,14 +396,14 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                   </div>
                 </FormControl>
               )}
-               <FormDescription>
+              <FormDescription>
                 {isViewMode ? "" : "Upload a banner image for the tournament."}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         {!isViewMode && <Button type="submit">Save</Button>}
       </form>
     </Form>

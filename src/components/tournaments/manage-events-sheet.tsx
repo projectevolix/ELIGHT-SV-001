@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Edit, Trash2, PlusCircle } from 'lucide-react';
-import { Tournament } from '@/app/tournaments/page';
+import { Tournament } from '@/app/(root)/tournaments/page';
 import { Badge } from '@/components/ui/badge';
 import { EventSheet } from './event-sheet';
 
@@ -88,12 +88,12 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
   const handleDeleteEvent = (eventId: number) => {
     setEvents(events.filter(e => e.id !== eventId));
   };
-  
+
   const handleSaveEvent = (data: Omit<Event, 'id'> & { id?: number }) => {
     if (eventSheetMode === 'create') {
-        setEvents([...events, { ...data, id: Date.now() } as Event]);
+      setEvents([...events, { ...data, id: Date.now() } as Event]);
     } else {
-        setEvents(events.map(e => e.id === data.id ? { ...data, id: data.id } as Event : e));
+      setEvents(events.map(e => e.id === data.id ? { ...data, id: data.id } as Event : e));
     }
     setEventSheetOpen(false);
   };
@@ -114,15 +114,15 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
             </div>
           </SheetHeader>
           <div className="pt-4">
-              <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm text-muted-foreground">
-                      A list of events in this tournament.
-                  </span>
-                  <Button onClick={handleCreateEvent}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Create Event
-                  </Button>
-              </div>
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm text-muted-foreground">
+                A list of events in this tournament.
+              </span>
+              <Button onClick={handleCreateEvent}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Event
+              </Button>
+            </div>
 
             <div className="border rounded-lg">
               <Table>
@@ -144,7 +144,7 @@ export function ManageEventsSheet({ open, onOpenChange, tournament }: ManageEven
                       <TableCell>{event.ageCategory}</TableCell>
                       <TableCell>{event.gender}</TableCell>
                       <TableCell>{event.weightClass}</TableCell>
-                       <TableCell>
+                      <TableCell>
                         {event.eventType === 'Team' ? `Team (${event.teamSize} members)` : 'Individual'}
                       </TableCell>
                       <TableCell>
