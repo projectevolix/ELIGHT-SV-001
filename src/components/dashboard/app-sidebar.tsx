@@ -22,12 +22,15 @@ import {
   Trophy,
   ClipboardEdit,
   GitBranch,
+  Loader2,
 } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import { ProfileDialog } from './profile-dialog';
+import { useCurrentUser } from '@/hooks/api/useUsers';
+import { LogoutButton } from '@/components/auth/logout-button';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -41,6 +44,7 @@ const menuItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const { data: currentUser, isPending: userLoading } = useCurrentUser();
 
   return (
     <>
@@ -48,7 +52,7 @@ export function AppSidebar() {
         <SidebarHeader>
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-               <Shield className="h-5 w-5" />
+              <Shield className="h-5 w-5" />
             </div>
             <span className="font-headline text-xl font-semibold">SportVerse</span>
           </div>
@@ -74,13 +78,20 @@ export function AppSidebar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-auto w-full justify-start gap-3 p-2">
                 <Avatar className="h-9 w-9">
+                  {currentUser?.imageUrl && <AvatarImage src={currentUser.imageUrl} />}
                   <AvatarFallback>
-                    <User className="h-5 w-5" />
+                    {userLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : currentUser ? (
+                      currentUser.name.split(' ').map(n => n[0]).join('')
+                    ) : (
+                      <User className="h-5 w-5" />
+                    )}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left group-data-[collapsible=icon]:hidden">
-                  <p className="font-medium text-sm">Andy Vogel</p>
-                  <p className="text-xs text-sidebar-foreground/70">andy.vogel@example.com</p>
+                  <p className="font-medium text-sm">{currentUser?.name || 'User'}</p>
+                  <p className="text-xs text-sidebar-foreground/70">{currentUser?.email || 'Loading...'}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -89,7 +100,7 @@ export function AppSidebar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => setProfileDialogOpen(true)}><User className="mr-2 h-4 w-4" />Profile</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <LogoutButton variant="ghost" size="sm" className="w-full justify-start" />
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarFooter>

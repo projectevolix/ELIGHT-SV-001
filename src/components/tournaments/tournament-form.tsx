@@ -24,12 +24,7 @@ import { format } from 'date-fns';
 import { Tournament } from '@/app/(root)/tournaments/page';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-
-const admins = [
-  { value: 'Andy Vogel', label: 'Andy Vogel' },
-  { value: 'Jane Doe', label: 'Jane Doe' },
-  { value: 'John Smith', label: 'John Smith' },
-];
+import { useUsers } from '@/hooks/api/useUsers';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -61,6 +56,7 @@ type TournamentFormProps = {
 export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps) {
   const isViewMode = mode === 'view';
   const [imagePreview, setImagePreview] = useState<string | null>(tournament?.bannerUrl || null);
+  const { data: admins = [], isPending: adminsLoading } = useUsers();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -324,13 +320,13 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                         "w-full justify-between",
                         !field.value && "text-muted-foreground"
                       )}
-                      disabled={isViewMode}
+                      disabled={isViewMode || adminsLoading}
                     >
                       {field.value
                         ? admins.find(
-                          (admin) => admin.value === field.value
-                        )?.label
-                        : "Select administrator"}
+                          (admin) => admin.id.toString() === field.value
+                        )?.name
+                        : adminsLoading ? "Loading administrators..." : "Select administrator"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
@@ -340,17 +336,21 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                     <CommandInput placeholder="Search administrator..." />
                     <CommandEmpty>No administrator found.</CommandEmpty>
                     <CommandGroup>
-                      {admins.map((admin) => (
-                        <CommandItem
-                          value={admin.label}
-                          key={admin.value}
-                          onSelect={() => {
-                            form.setValue("admin", admin.value)
-                          }}
-                        >
-                          {admin.label}
-                        </CommandItem>
-                      ))}
+                      {adminsLoading ? (
+                        <CommandEmpty>Loading administrators...</CommandEmpty>
+                      ) : (
+                        admins.map((admin) => (
+                          <CommandItem
+                            value={admin.name}
+                            key={admin.id}
+                            onSelect={() => {
+                              form.setValue("admin", admin.id.toString())
+                            }}
+                          >
+                            {admin.name}
+                          </CommandItem>
+                        ))
+                      )}
                     </CommandGroup>
                   </Command>
                 </PopoverContent>

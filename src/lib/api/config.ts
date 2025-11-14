@@ -29,6 +29,14 @@ export const API_PATHS = {
     UPDATE: (id: string | number) => `/associations/${id}`,
     DELETE: (id: string | number) => `/associations/${id}`,
   },
+  USERS: {
+    LIST: "/users",
+    SEARCH: "/users/search",
+    ME: "/users/me",
+    GET: (id: string | number) => `/users/${id}`,
+    UPDATE: (id: string | number) => `/users/${id}`,
+    DELETE: (id: string | number) => `/users/${id}`,
+  },
 } as const;
 
 /**

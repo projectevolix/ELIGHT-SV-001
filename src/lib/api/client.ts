@@ -43,8 +43,8 @@ class ApiClientError extends Error implements ApiError {
  * Token storage helper (uses localStorage for now, can be swapped with cookie-based approach)
  */
 class TokenStorage {
-  private static readonly TOKEN_KEY = "sv_auth_token";
-  private static readonly TOKEN_TYPE_KEY = "sv_auth_token_type";
+  private static readonly TOKEN_KEY = "auth_token";
+  private static readonly TOKEN_TYPE_KEY = "auth_token_type";
 
   static setToken(token: string, tokenType: string = "Bearer"): void {
     if (typeof window !== "undefined") {
