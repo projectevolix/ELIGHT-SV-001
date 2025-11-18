@@ -262,6 +262,7 @@ export default function AssociationsPage() {
         mode={sheetMode}
         association={selectedAssociation}
         onSave={handleSave}
+        isLoading={isCreating || isUpdating}
       />
       <ManageCoachesSheet
         open={manageCoachesSheetOpen}

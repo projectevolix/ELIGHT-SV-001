@@ -60,6 +60,15 @@ export const API_PATHS = {
     BY_TOURNAMENT: "/events/tournament",
     BY_STATUS: "/events/status",
   },
+  COACHES: {
+    LIST: "/api/coaches",
+    GET: (id: string | number) => `/api/coaches/${id}`,
+    CREATE: "/api/coaches",
+    UPDATE: (id: string | number) => `/api/coaches/${id}`,
+    DELETE: (id: string | number) => `/api/coaches/${id}`,
+    BY_ASSOCIATION: (associationId: string | number) =>
+      `/api/coaches/association/${associationId}`,
+  },
 } as const;
 
 /**

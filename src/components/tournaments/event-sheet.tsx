@@ -32,9 +32,10 @@ type EventSheetProps = {
   mode: 'view' | 'create' | 'edit';
   event: EventDTO | null;
   onSave: (data: FormValues) => void;
+  isLoading?: boolean;
 };
 
-export function EventSheet({ open, onOpenChange, mode, event, onSave }: EventSheetProps) {
+export function EventSheet({ open, onOpenChange, mode, event, onSave, isLoading = false }: EventSheetProps) {
   const titles = {
     view: 'View Event',
     edit: 'Edit Event',
@@ -68,7 +69,7 @@ export function EventSheet({ open, onOpenChange, mode, event, onSave }: EventShe
             {mode === 'view' ? (
               <EventDetails event={event} />
             ) : (
-              <EventForm mode={mode} event={event} onSave={handleSave} onCancel={() => onOpenChange(false)} />
+              <EventForm mode={mode} event={event} onSave={handleSave} onCancel={() => onOpenChange(false)} isLoading={isLoading} />
             )}
           </div>
         </div>

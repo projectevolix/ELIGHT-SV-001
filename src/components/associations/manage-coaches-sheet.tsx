@@ -22,29 +22,20 @@ import {
 import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye } from 'lucide-react';
 import { Association } from '@/app/(root)/associations/page';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { CoachSheet } from './coach-sheet';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { CoachDetailsDialog } from './coach-details-dialog';
+import { useCoachesByAssociation } from '@/hooks/api/useCoaches';
+import { useDeleteCoach } from '@/hooks/api/useCoachMutations';
+import { CoachDTO } from '@/types/api/coaches';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
-export type Coach = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  dob: Date;
-  photoUrl?: string;
-  slkfId: string;
-  wkfId: string;
+export type Coach = CoachDTO & {
+  dob: string | Date;
 };
-
-const initialCoaches: Coach[] = [
-  { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', dob: new Date('1985-05-15'), slkfId: 'SLKF-001', wkfId: 'WKF-101', photoUrl: 'https://picsum.photos/seed/coach1/40/40' },
-  { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', dob: new Date('1990-08-22'), slkfId: 'SLKF-002', wkfId: 'WKF-102' },
-  { id: 3, firstName: 'Mike', lastName: 'Johnson', email: 'mike.johnson@example.com', dob: new Date('1978-11-30'), slkfId: 'SLKF-003', wkfId: 'WKF-103', photoUrl: 'https://picsum.photos/seed/coach3/40/40' },
-];
 
 type ManageCoachesSheetProps = {
   open: boolean;
@@ -53,7 +44,6 @@ type ManageCoachesSheetProps = {
 };
 
 export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCoachesSheetProps) {
-  const [coaches, setCoaches] = useState<Coach[]>(initialCoaches);
   const [coachSheetOpen, setCoachSheetOpen] = useState(false);
   const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
@@ -61,6 +51,15 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
   const [coachToDelete, setCoachToDelete] = useState<Coach | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
+  // Fetch coaches for the association
+  const {
+    data: coaches = [],
+    isLoading,
+    error,
+  } = useCoachesByAssociation(association?.id);
+
+  // Delete mutation
+  const deleteMutation = useDeleteCoach();
 
   const handleCreateCoach = () => {
     setSheetMode('create');
@@ -85,21 +84,14 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
   };
 
   const handleDeleteConfirm = () => {
-    if (coachToDelete) {
-      setCoaches(coaches.filter(c => c.id !== coachToDelete.id));
+    if (coachToDelete && association?.id) {
+      deleteMutation.mutate({ id: coachToDelete.id, associationId: association.id });
     }
     setDeleteAlertOpen(false);
     setCoachToDelete(null);
   };
 
-  const handleSaveCoach = (data: Omit<Coach, 'id'> & { id?: number }) => {
-    if (sheetMode === 'create') {
-      setCoaches([...coaches, { ...data, id: Date.now() } as Coach]);
-    } else {
-      setCoaches(coaches.map(c => c.id === data.id ? { ...data, id: data.id } as Coach : c));
-    }
-    setCoachSheetOpen(false);
-  };
+  if (!association) return null;
 
 
   return (
@@ -115,7 +107,7 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
                 </SheetDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button onClick={handleCreateCoach}>
+                <Button onClick={handleCreateCoach} disabled={isLoading}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Create Coach
                 </Button>
@@ -129,6 +121,11 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
             </div>
           </SheetHeader>
           <div className="px-6 pb-6">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm text-muted-foreground">
+                {isLoading ? 'Loading coaches...' : `${coaches.length} coach${coaches.length !== 1 ? 'es' : ''} in this association.`}
+              </span>
+            </div>
             <div className="border rounded-lg">
               <Table>
                 <TableHeader>
@@ -144,48 +141,64 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {coaches.map((coach) => (
-                    <TableRow key={coach.id} onClick={() => handleViewCoach(coach)} className="cursor-pointer">
-                      <TableCell>
-                        <Avatar className="h-8 w-8">
-                          {coach.photoUrl ? <AvatarImage src={coach.photoUrl} alt={`${coach.firstName} ${coach.lastName}`} data-ai-hint="person face" /> : null}
-                          <AvatarFallback>
-                            <UserCircle className="h-6 w-6 text-muted-foreground" />
-                          </AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-                      <TableCell className="font-medium">{coach.firstName}</TableCell>
-                      <TableCell>{coach.lastName}</TableCell>
-                      <TableCell>{coach.email}</TableCell>
-                      <TableCell>{format(coach.dob, 'MMM d, yyyy')}</TableCell>
-                      <TableCell>{coach.slkfId}</TableCell>
-                      <TableCell>{coach.wkfId}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewCoach(coach) }}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              <span>View</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditCoach(coach) }}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(coach) }} className="text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Delete</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                  {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell colSpan={8}>
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : coaches.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                        No coaches yet. Create one to get started.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    coaches.map((coach) => (
+                      <TableRow key={coach.id} onClick={() => handleViewCoach(coach)} className="cursor-pointer">
+                        <TableCell>
+                          <Avatar className="h-8 w-8">
+                            {coach.photo ? <AvatarImage src={coach.photo} alt={`${coach.firstName} ${coach.lastName}`} data-ai-hint="person face" /> : null}
+                            <AvatarFallback>
+                              <UserCircle className="h-6 w-6 text-muted-foreground" />
+                            </AvatarFallback>
+                          </Avatar>
+                        </TableCell>
+                        <TableCell className="font-medium">{coach.firstName}</TableCell>
+                        <TableCell>{coach.lastName}</TableCell>
+                        <TableCell>{coach.email}</TableCell>
+                        <TableCell>{format(parseISO(coach.dob as string), 'MMM d, yyyy')}</TableCell>
+                        <TableCell>{coach.slkfId}</TableCell>
+                        <TableCell>{coach.wkfId}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewCoach(coach) }}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                <span>View</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditCoach(coach) }}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Edit</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(coach) }} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                <span>Delete</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -197,7 +210,7 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
         onOpenChange={setCoachSheetOpen}
         mode={sheetMode as 'edit' | 'create'}
         coach={selectedCoach}
-        onSave={handleSaveCoach}
+        associationId={association?.id}
       />
       <CoachDetailsDialog
         open={detailsDialogOpen}

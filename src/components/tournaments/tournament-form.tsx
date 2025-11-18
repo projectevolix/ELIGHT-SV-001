@@ -53,9 +53,10 @@ type TournamentFormProps = {
   mode: 'view' | 'edit' | 'create';
   tournament: Omit<Tournament, 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'adminName' | 'adminEmail' | 'adminId'> & { adminId?: number, adminIds?: number[] } | null;
   onSave: (data: any) => void;
+  isLoading?: boolean;
 };
 
-export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps) {
+export function TournamentForm({ mode, tournament, onSave, isLoading = false }: TournamentFormProps) {
   const isViewMode = mode === 'view';
   const [imagePreview, setImagePreview] = useState<string | null>(tournament?.bannerUrl || null);
   const { data: admins = [], isPending: adminsLoading } = useUsers();
@@ -412,7 +413,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
           )}
         />
 
-        {!isViewMode && <Button type="submit">Save</Button>}
+        {!isViewMode && <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save'}</Button>}
       </form>
     </Form>
   );

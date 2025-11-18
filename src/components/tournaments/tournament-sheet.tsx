@@ -20,9 +20,10 @@ type TournamentSheetProps = {
   mode: 'view' | 'edit' | 'create';
   tournament: Tournament | null;
   onSave: (data: any) => void;
+  isLoading?: boolean;
 };
 
-export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }: TournamentSheetProps) {
+export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave, isLoading = false }: TournamentSheetProps) {
   const titles = {
     view: 'View Tournament',
     edit: 'Edit Tournament',
@@ -63,7 +64,7 @@ export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }
             {mode === 'view' ? (
               <TournamentDetails tournament={tournament} />
             ) : (
-              <TournamentForm mode={mode} tournament={tournament} onSave={onSave} />
+              <TournamentForm mode={mode} tournament={tournament} onSave={onSave} isLoading={isLoading} />
             )}
           </div>
         </div>

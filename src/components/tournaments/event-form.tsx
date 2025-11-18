@@ -37,9 +37,10 @@ type EventFormProps = {
   event: EventDTO | null;
   onSave: (data: FormValues) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 };
 
-export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
+export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: EventFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -247,7 +248,7 @@ export function EventForm({ mode, event, onSave, onCancel }: EventFormProps) {
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Save</Button>
+          <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save'}</Button>
         </div>
       </form>
     </Form>

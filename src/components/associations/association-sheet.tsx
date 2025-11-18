@@ -17,9 +17,10 @@ type AssociationSheetProps = {
   mode: 'edit' | 'create';
   association: Association | null;
   onSave: (data: Omit<Association, 'id' | 'createdAt' | 'updatedAt'> & { id?: string | number }) => void;
+  isLoading?: boolean;
 };
 
-export function AssociationSheet({ open, onOpenChange, mode, association, onSave }: AssociationSheetProps) {
+export function AssociationSheet({ open, onOpenChange, mode, association, onSave, isLoading = false }: AssociationSheetProps) {
   const titles = {
     edit: 'Edit Association',
     create: 'Create New Association',
@@ -43,6 +44,7 @@ export function AssociationSheet({ open, onOpenChange, mode, association, onSave
             association={association}
             onSave={onSave}
             onCancel={() => onOpenChange(false)}
+            isLoading={isLoading}
           />
         </div>
       </SheetContent>

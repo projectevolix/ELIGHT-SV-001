@@ -195,3 +195,42 @@ export function getEventInvalidationKeys(tournamentId?: number) {
 
   return keys;
 }
+
+/**
+ * Query key factory for coaches
+ */
+export const coachKeys = {
+  all: ["coaches"] as const,
+  lists: () => [...coachKeys.all, "list"] as const,
+  list: (page: number = 1, limit: number = 10) =>
+    [...coachKeys.lists(), { page, limit }] as const,
+  details: () => [...coachKeys.all, "detail"] as const,
+  detail: (id: string | number | null | undefined) =>
+    id !== null && id !== undefined
+      ? [...coachKeys.details(), id]
+      : [...coachKeys.details(), "undefined"],
+  byAssociation: (associationId: number) =>
+    [...coachKeys.all, "association", associationId] as const,
+  byAssociationList: (
+    associationId: number,
+    page: number = 1,
+    limit: number = 10
+  ) => [...coachKeys.byAssociation(associationId), { page, limit }] as const,
+} as const;
+
+/**
+ * Helper to invalidate all coach-related queries
+ * Useful after mutations (create, update, delete)
+ */
+export function getCoachInvalidationKeys(associationId?: number) {
+  const keys: any[] = [coachKeys.lists()];
+
+  if (associationId) {
+    keys.push(
+      coachKeys.byAssociation(associationId),
+      coachKeys.byAssociationList(associationId)
+    );
+  }
+
+  return keys;
+}

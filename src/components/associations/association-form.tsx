@@ -30,9 +30,10 @@ type AssociationFormProps = {
   association: Association | null;
   onSave: (data: Omit<Association, 'id' | 'createdAt' | 'updatedAt'> & { id?: string | number }) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 };
 
-export function AssociationForm({ mode, association, onSave, onCancel }: AssociationFormProps) {
+export function AssociationForm({ mode, association, onSave, onCancel, isLoading = false }: AssociationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -138,8 +139,8 @@ export function AssociationForm({ mode, association, onSave, onCancel }: Associa
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button type="submit">Save</Button>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>Cancel</Button>
+          <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save'}</Button>
         </div>
       </form>
     </Form>
