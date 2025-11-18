@@ -287,9 +287,8 @@ export function ManageEventsSheet({
             <div className="text-sm text-muted-foreground">
               {isLoading
                 ? 'Loading events...'
-                : `${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''}${
-                    searchTerm || statusFilter !== 'all' ? ' (filtered)' : ''
-                  }`}
+                : `${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''}${searchTerm || statusFilter !== 'all' ? ' (filtered)' : ''
+                }`}
             </div>
 
             {/* Events table */}
