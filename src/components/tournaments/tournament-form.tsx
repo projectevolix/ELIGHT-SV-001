@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -15,16 +16,16 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, UploadCloud, ChevronsUpDown } from 'lucide-react';
+import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Tournament } from '@/app/(root)/tournaments/page';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useUsers } from '@/hooks/api/useUsers';
+import MultiSelect from '../ui/multi-select';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -34,7 +35,7 @@ const formSchema = z.object({
   endDate: z.date({ required_error: 'An end date is required.' }),
   registrationStartDate: z.date({ required_error: 'A registration start date is required.' }),
   registrationEndDate: z.date({ required_error: 'A registration end date is required.' }),
-  admin: z.string({ required_error: 'Please select an admin.' }),
+  admin: z.array(z.string()).min(1, 'Please select at least one admin.'),
   bannerUrl: z.string().url().optional().or(z.literal('')),
 }).refine(data => data.endDate >= data.startDate, {
   message: "End date cannot be before start date",
@@ -64,9 +65,10 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
       name: '',
       grade: 'Club',
       venue: '',
-      admin: '',
+      admin: [],
       bannerUrl: '',
       ...tournament,
+      admin: tournament?.admin ? [tournament.admin] : [],
     },
   });
 
@@ -75,9 +77,10 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
       name: '',
       grade: 'Club',
       venue: '',
-      admin: '',
+      admin: [],
       bannerUrl: '',
       ...tournament,
+      admin: tournament?.admin ? [tournament.admin] : [],
     };
     form.reset(defaultValues);
     setImagePreview(defaultValues.bannerUrl || null);
@@ -87,6 +90,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
     onSave({
       ...values,
       id: tournament?.id,
+      admin: values.admin.join(', '), // Convert array to string for saving
     });
   }
 
@@ -102,6 +106,11 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
       reader.readAsDataURL(file);
     }
   };
+
+  const adminOptions = admins.map(admin => ({
+    value: admin.id.toString(),
+    label: admin.name
+  }));
 
   return (
     <Form {...form}>
@@ -308,57 +317,22 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
           control={form.control}
           name="admin"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem>
               <FormLabel>Administrator</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      disabled={isViewMode || adminsLoading}
-                    >
-                      {field.value
-                        ? admins.find(
-                          (admin) => admin.id.toString() === field.value
-                        )?.name
-                        : adminsLoading ? "Loading administrators..." : "Select administrator"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search administrator..." />
-                    <CommandEmpty>No administrator found.</CommandEmpty>
-                    <CommandGroup>
-                      {adminsLoading ? (
-                        <CommandEmpty>Loading administrators...</CommandEmpty>
-                      ) : (
-                        admins.map((admin) => (
-                          <CommandItem
-                            value={admin.name}
-                            key={admin.id}
-                            onSelect={() => {
-                              form.setValue("admin", admin.id.toString())
-                            }}
-                          >
-                            {admin.name}
-                          </CommandItem>
-                        ))
-                      )}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <MultiSelect
+                    options={adminOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    placeholder={adminsLoading ? 'Loading...' : 'Select administrators...'}
+                    className={isViewMode ? 'pointer-events-none opacity-50' : ''}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
 
         <FormField
           control={form.control}
@@ -409,3 +383,5 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
     </Form>
   );
 }
+
+    
