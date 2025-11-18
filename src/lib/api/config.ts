@@ -50,6 +50,16 @@ export const API_PATHS = {
     RESEND_ADMIN_INVITE: (id: string | number) =>
       `/tournaments/${id}/admin-invite/resend`,
   },
+  EVENTS: {
+    LIST: "/events",
+    DETAIL: "/events",
+    CREATE: "/events",
+    UPDATE: "/events",
+    DELETE: "/events",
+    STATUS: "/events",
+    BY_TOURNAMENT: "/events/tournament",
+    BY_STATUS: "/events/status",
+  },
 } as const;
 
 /**

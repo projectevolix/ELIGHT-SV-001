@@ -156,3 +156,42 @@ export function getTournamentInvalidationKeys(
 
   return keys;
 }
+
+/**
+ * Query key factory for events
+ */
+export const eventKeys = {
+  all: ["events"] as const,
+  lists: () => [...eventKeys.all, "list"] as const,
+  list: (page: number = 1, limit: number = 10) =>
+    [...eventKeys.lists(), { page, limit }] as const,
+  details: () => [...eventKeys.all, "detail"] as const,
+  detail: (id: string | number | null | undefined) =>
+    id !== null && id !== undefined
+      ? [...eventKeys.details(), id]
+      : [...eventKeys.details(), "undefined"],
+  byTournament: (tournamentId: number) =>
+    [...eventKeys.all, "tournament", tournamentId] as const,
+  byTournamentList: (
+    tournamentId: number,
+    page: number = 1,
+    limit: number = 10
+  ) => [...eventKeys.byTournament(tournamentId), { page, limit }] as const,
+  byStatus: () => [...eventKeys.all, "status"] as const,
+  status: (status: string, page: number = 1, limit: number = 10) =>
+    [...eventKeys.byStatus(), { status, page, limit }] as const,
+} as const;
+
+/**
+ * Helper to invalidate all event-related queries
+ * Useful after mutations (create, update, delete, status change)
+ */
+export function getEventInvalidationKeys(tournamentId?: number) {
+  const keys: any[] = [eventKeys.lists(), eventKeys.byStatus()];
+
+  if (tournamentId) {
+    keys.push(eventKeys.byTournament(tournamentId));
+  }
+
+  return keys;
+}

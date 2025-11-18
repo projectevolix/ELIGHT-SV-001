@@ -6,43 +6,71 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetClose,
 } from '@/components/ui/sheet';
-import { Event } from './manage-events-sheet';
+import { EventDTO } from '@/types/api/events';
 import { EventForm } from './event-form';
+import { EventDetails } from './event-details';
+import { X } from 'lucide-react';
+import { z } from 'zod';
+
+const formSchema = z.object({
+  discipline: z.string(),
+  ageCategory: z.string(),
+  gender: z.string(),
+  weightClass: z.string(),
+  status: z.string(),
+  eventType: z.string(),
+  rounds: z.number(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 type EventSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'create' | 'edit';
-  event: Event | null;
-  onSave: (data: Omit<Event, 'status' | 'id'> & { id?: number, status: Event['status'] }) => void;
+  mode: 'view' | 'create' | 'edit';
+  event: EventDTO | null;
+  onSave: (data: FormValues) => void;
 };
 
 export function EventSheet({ open, onOpenChange, mode, event, onSave }: EventSheetProps) {
   const titles = {
+    view: 'View Event',
     edit: 'Edit Event',
     create: 'Create New Event',
   };
 
   const descriptions = {
+    view: 'Here are the details for the event.',
     edit: 'Update the details for this event.',
     create: 'Fill out the form to create a new event.',
   };
 
+  const handleSave = (data: FormValues) => {
+    onSave(data);
+    onOpenChange(false);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle>{titles[mode]}</SheetTitle>
-          <SheetDescription>{descriptions[mode]}</SheetDescription>
-        </SheetHeader>
-        <div className="py-8">
-            <EventForm 
-                mode={mode}
-                event={event} 
-                onSave={onSave}
-                onCancel={() => onOpenChange(false)} 
-            />
+      <SheetContent className="sm:max-w-lg overflow-y-auto p-0" showCloseButton={false}>
+        <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetClose>
+        <div className="px-6">
+          <SheetHeader className="mt-6">
+            <SheetTitle>{titles[mode]}</SheetTitle>
+            <SheetDescription>{descriptions[mode]}</SheetDescription>
+          </SheetHeader>
+          <div className="py-8">
+            {mode === 'view' ? (
+              <EventDetails event={event} />
+            ) : (
+              <EventForm mode={mode} event={event} onSave={handleSave} onCancel={() => onOpenChange(false)} />
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>

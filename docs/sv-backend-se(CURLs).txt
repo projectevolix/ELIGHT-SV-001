@@ -1,0 +1,1200 @@
+http://localhost:8080/api/v1/sv-backend-service
+----------------
+auth
+----------------
+/auth/login
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/auth/login' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "email": "bhanukaviraj22@gmail.com",
+  "password": "Viraj@2002"
+}'
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg",
+    "tokenType": "Bearer"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+-------
+auth/signup
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/auth/signup' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "jhon",
+  "email": "jhon@gmail.com",
+  "password": "Viraj@2002"
+}'
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "success": true,
+    "message": "User registered successfully!"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+********associaitions***********
+--------
+/associations
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "association1",
+  "province": "central",
+  "contactEmail": "association1@gmail.com",
+  "contactNumber": "0759457878",
+  "presidentName": "Bhanuka"
+}'
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 1,
+    "name": "association1",
+    "province": "central",
+    "contactEmail": "association1@gmail.com",
+    "contactNumber": "0759457878",
+    "presidentName": "Bhanuka",
+    "createdAt": "2025-11-12T15:24:55.3120794",
+    "updatedAt": "2025-11-12T15:24:55.3120794"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+----------
+/associations
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg'
+
+response
+{
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 1,
+      "name": "association1",
+      "province": "central",
+      "contactEmail": "association1@gmail.com",
+      "contactNumber": "0759457878",
+      "presidentName": "Bhanuka",
+      "createdAt": "2025-11-12T15:24:55.312079",
+      "updatedAt": "2025-11-12T15:24:55.312079"
+    }
+  ],
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+----------
+/associations/search
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations/search?name=ass' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg'
+
+response
+{
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 1,
+      "name": "association1",
+      "province": "central",
+      "contactEmail": "association1@gmail.com",
+      "contactNumber": "0759457878",
+      "presidentName": "Bhanuka",
+      "createdAt": "2025-11-12T15:24:55.312079",
+      "updatedAt": "2025-11-12T15:24:55.312079"
+    }
+  ],
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+------------
+
+/associations/{id}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations/1' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 1,
+    "name": "association1",
+    "province": "central",
+    "contactEmail": "association1@gmail.com",
+    "contactNumber": "0759457878",
+    "presidentName": "Bhanuka",
+    "createdAt": "2025-11-12T15:24:55.312079",
+    "updatedAt": "2025-11-12T15:24:55.312079"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+---------------
+/associations/{id}
+
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations/1' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "ass1",
+  "province": "western",
+  "contactEmail": "ass1@gmail.com",
+  "contactNumber": "0754789898",
+  "presidentName": "Oshan"
+}'
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 1,
+    "name": "ass1",
+    "province": "western",
+    "contactEmail": "ass1@gmail.com",
+    "contactNumber": "0754789898",
+    "presidentName": "Oshan",
+    "createdAt": null,
+    "updatedAt": null
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+------------
+/associations/province/{province}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations/province/western' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg'
+
+response
+{
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 1,
+      "name": "ass1",
+      "province": "western",
+      "contactEmail": "ass1@gmail.com",
+      "contactNumber": "0754789898",
+      "presidentName": "Oshan",
+      "createdAt": "2025-11-12T15:24:55.312079",
+      "updatedAt": "2025-11-12T15:29:04.291251"
+    }
+  ],
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+------------
+
+/associations/{id}
+
+curl -X 'DELETE' \
+  'http://localhost:8080/api/v1/sv-backend-service/associations/1' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYyOTM2MzQxLCJleHAiOjE3NjM4MDAzNDF9.00ZOP_qA9_oX-QXtdM8gatsNUDd2hjP_-pDMMD15s048oi_XS8wmKbZLn2u2q1HyHX_MePP_qIclMXKAN2ibwg'
+
+
+
+
+
+********* users ************
+-----------
+/users
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/users' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg'
+
+response
+{
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 1,
+      "name": "janith",
+      "email": "janith@gmail.com",
+      "imageUrl": null,
+      "emailVerified": false,
+      "role": "USER",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-05T17:09:27.565871",
+      "updatedAt": "2025-11-05T17:09:27.565871",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 2,
+      "name": "Bhanuka viraj",
+      "email": "bhanukaviraj22@gmail.com",
+      "imageUrl": null,
+      "emailVerified": false,
+      "role": "USER",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-06T17:20:36.788209",
+      "updatedAt": "2025-11-06T17:20:36.788209",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 3,
+      "name": "bhanuka",
+      "email": "bhanukaviraj33@gmail.com",
+      "imageUrl": null,
+      "emailVerified": false,
+      "role": "USER",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-09T22:08:02.576998",
+      "updatedAt": "2025-11-09T22:08:02.576998",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 4,
+      "name": "jhon",
+      "email": "jhon@gmail.com",
+      "imageUrl": null,
+      "emailVerified": false,
+      "role": "USER",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-12T14:03:12.363321",
+      "updatedAt": "2025-11-12T14:03:12.363321",
+      "createdBy": "system",
+      "updatedBy": "system"
+    }
+  ],
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+
+--------
+/user/{id}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/users/1' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 1,
+    "name": "janith",
+    "email": "janith@gmail.com",
+    "imageUrl": null,
+    "emailVerified": false,
+    "role": "USER",
+    "provider": "LOCAL",
+    "providerId": null,
+    "createdAt": "2025-11-05T17:09:27.565871",
+    "updatedAt": "2025-11-05T17:09:27.565871",
+    "createdBy": "system",
+    "updatedBy": "system"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+------------
+
+users/{id}
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/users/2' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "viraj madhuranga",
+  "email": "bhanukavirajee22@gmail.com",
+  "imageUrl": "http://www.sample.com",
+  "emailVerified": true,
+  "role": "ADMIN"
+}'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 2,
+    "name": "viraj madhuranga",
+    "email": "bhanukavirajee22@gmail.com",
+    "imageUrl": "http://www.sample.com",
+    "emailVerified": true,
+    "role": "ADMIN",
+    "provider": "LOCAL",
+    "providerId": null,
+    "createdAt": "2025-11-06T17:20:36.788209",
+    "updatedAt": "2025-11-06T17:20:36.788209",
+    "createdBy": "system",
+    "updatedBy": "system"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+-----------
+
+users/search
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/users/search?q=bhanu' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 3,
+      "name": "bhanuka",
+      "email": "bhanukaviraj33@gmail.com",
+      "imageUrl": null,
+      "emailVerified": false,
+      "role": "USER",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-09T22:08:02.576998",
+      "updatedAt": "2025-11-09T22:08:02.576998",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 2,
+      "name": "viraj madhuranga",
+      "email": "bhanukavirajee22@gmail.com",
+      "imageUrl": "http://www.sample.com",
+      "emailVerified": true,
+      "role": "ADMIN",
+      "provider": "LOCAL",
+      "providerId": null,
+      "createdAt": "2025-11-06T17:20:36.788209",
+      "updatedAt": "2025-11-14T15:08:07.336658",
+      "createdBy": "system",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+-----------------
+
+users/me
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/users/me' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg'
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 2,
+    "name": "viraj madhuranga",
+    "email": "bhanukavirajee22@gmail.com",
+    "imageUrl": "http://www.sample.com",
+    "emailVerified": true,
+    "role": "ADMIN",
+    "provider": "LOCAL",
+    "providerId": null,
+    "createdAt": "2025-11-06T17:20:36.788209",
+    "updatedAt": "2025-11-14T15:08:07.336658",
+    "createdBy": "system",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+---------------
+
+users/{id}
+
+curl -X 'DELETE' \
+  'http://localhost:8080/api/v1/sv-backend-service/users/2' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMTEyODg5LCJleHAiOjE3NjM5NzY4ODl9.rhhzY24RS3QViPToNPwCF_bNwxgyppylqd0ZmuslEbTTKznTPBBFgbed2lToq58HKudLvhmMwX8qQI9Tl2Nrxg'
+
+response
+{
+  "message": "Operation successful",
+  "data": null,
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+----------------
+
+
+
+
+
+
+
+---------------------
+
+**************tournaments**********
+/tournaments
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDQyMTg4LCJleHAiOjE3NjQzMDYxODh9.LshtjDkdbSX-seu43tLB34rZbv2xdrM1GzaCrVgivakjx-p7zYSm9VQY80vpuKK7vy0m37-IUuhPR2UBXsztzg' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "tour01",
+  "grade": "LOCAL",
+  "venue": "example ",
+  "startDate": "2025-11-18",
+  "endDate": "2025-11-20",
+  "regStartDate": "2025-11-18",
+  "regEndDate": "2025-11-19",
+  "status": "SCHEDULED",
+  "bannerUrl": "https://www.example.com",
+  "adminId": 1
+}'
+
+enums: status - SCHEDULED, ONGOING, FINISHED
+enums: grade -NATIONAL, LOCAL, INTERNATIONAL, REGIONAL, ELITE
+
+
+response:
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 3,
+    "name": "tour01",
+    "grade": "LOCAL",
+    "venue": "example ",
+    "startDate": "2025-11-18",
+    "endDate": "2025-11-20",
+    "regStartDate": "2025-11-18",
+    "regEndDate": "2025-11-19",
+    "status": "SCHEDULED",
+    "bannerUrl": "https://www.example.com",
+    "createdAt": "2025-11-18T10:35:56.3914059",
+    "updatedAt": "2025-11-18T10:35:56.3914059",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+---------------
+/tournaments
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments?page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDUxMzEyLCJleHAiOjE3NjQzMTUzMTJ9._EN30vQJn-kQje2aa81LpGwnCcvJNNof85S10nhJ2-kNUVDbr41hwh40woGX8py7d1u8hmIHuWdZAcJ5z3bD_A'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 3,
+      "name": "tour01",
+      "grade": "REGIONAL",
+      "venue": "example ",
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-20",
+      "regStartDate": "2025-11-17",
+      "regEndDate": "2025-11-19",
+      "status": "ONGOING",
+      "bannerUrl": "https://www.example.com",
+      "adminId": 1,
+      "adminName": "janith",
+      "adminEmail": "janith@gmail.com",
+      "createdAt": "2025-11-18T10:35:56.391406",
+      "updatedAt": "2025-11-18T11:09:04.805039",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 1
+}
+
+-----------
+/tournaments/{id}
+
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/3' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDQyMTg4LCJleHAiOjE3NjQzMDYxODh9.LshtjDkdbSX-seu43tLB34rZbv2xdrM1GzaCrVgivakjx-p7zYSm9VQY80vpuKK7vy0m37-IUuhPR2UBXsztzg' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "tour01",
+  "grade": "REGIONAL",
+  "venue": "example ",
+  "startDate": "2025-11-17",
+  "endDate": "2025-11-20",
+  "regStartDate": "2025-11-17",
+  "regEndDate": "2025-11-19",
+  "status": "ONGOING",
+  "bannerUrl": "https://www.example.com",
+  "adminId": 1
+}}'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 3,
+    "name": "tour01",
+    "grade": "REGIONAL",
+    "venue": "example ",
+    "startDate": "2025-11-17",
+    "endDate": "2025-11-20",
+    "regStartDate": "2025-11-17",
+    "regEndDate": "2025-11-19",
+    "status": "ONGOING",
+    "bannerUrl": "https://www.example.com",
+    "adminId": 1,
+    "adminName": "janith",
+    "adminEmail": "janith@gmail.com",
+    "createdAt": "2025-11-18T10:35:56.391406",
+    "updatedAt": "2025-11-18T10:35:56.391406",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+-----------------
+/tournaments/{id}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/3' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDQyMTg4LCJleHAiOjE3NjQzMDYxODh9.LshtjDkdbSX-seu43tLB34rZbv2xdrM1GzaCrVgivakjx-p7zYSm9VQY80vpuKK7vy0m37-IUuhPR2UBXsztzg'
+
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    "id": 3,
+    "name": "tour01",
+    "grade": "REGIONAL",
+    "venue": "example ",
+    "startDate": "2025-11-17",
+    "endDate": "2025-11-20",
+    "regStartDate": "2025-11-17",
+    "regEndDate": "2025-11-19",
+    "status": "ONGOING",
+    "bannerUrl": "https://www.example.com",
+    "adminId": 1,
+    "adminName": "janith",
+    "adminEmail": "janith@gmail.com",
+    "createdAt": "2025-11-18T10:35:56.391406",
+    "updatedAt": "2025-11-18T11:09:04.805039",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "pagination": null,
+  "httpStatus": 200,
+  "count": 0
+}
+
+------------------
+
+/tournaments/{id}/status
+
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/3/status?status=ONGOING' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDQyMTg4LCJleHAiOjE3NjQzMDYxODh9.LshtjDkdbSX-seu43tLB34rZbv2xdrM1GzaCrVgivakjx-p7zYSm9VQY80vpuKK7vy0m37-IUuhPR2UBXsztzg'
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 3,
+    "name": "tour01",
+    "grade": "REGIONAL",
+    "venue": "example ",
+    "startDate": "2025-11-17",
+    "endDate": "2025-11-20",
+    "regStartDate": "2025-11-17",
+    "regEndDate": "2025-11-19",
+    "status": "ONGOING",
+    "bannerUrl": "https://www.example.com",
+    "adminId": 1,
+    "adminName": "janith",
+    "adminEmail": "janith@gmail.com",
+    "createdAt": "2025-11-18T10:35:56.391406",
+    "updatedAt": "2025-11-18T11:09:04.805039",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+-----------------
+/tournaments/status/{status}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/status/ONGOING?page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDUxMzEyLCJleHAiOjE3NjQzMTUzMTJ9._EN30vQJn-kQje2aa81LpGwnCcvJNNof85S10nhJ2-kNUVDbr41hwh40woGX8py7d1u8hmIHuWdZAcJ5z3bD_A'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 3,
+      "name": "tour01",
+      "grade": "REGIONAL",
+      "venue": "example ",
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-20",
+      "regStartDate": "2025-11-17",
+      "regEndDate": "2025-11-19",
+      "status": "ONGOING",
+      "bannerUrl": "https://www.example.com",
+      "adminId": 1,
+      "adminName": "janith",
+      "adminEmail": "janith@gmail.com",
+      "createdAt": "2025-11-18T10:35:56.391406",
+      "updatedAt": "2025-11-18T11:09:04.805039",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 1
+}
+------------
+/tournaments/dates
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/dates?start=2025-11-17&end=2025-11-20&page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDUxMzEyLCJleHAiOjE3NjQzMTUzMTJ9._EN30vQJn-kQje2aa81LpGwnCcvJNNof85S10nhJ2-kNUVDbr41hwh40woGX8py7d1u8hmIHuWdZAcJ5z3bD_A'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 3,
+      "name": "tour01",
+      "grade": "REGIONAL",
+      "venue": "example ",
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-20",
+      "regStartDate": "2025-11-17",
+      "regEndDate": "2025-11-19",
+      "status": "ONGOING",
+      "bannerUrl": "https://www.example.com",
+      "adminId": 1,
+      "adminName": "janith",
+      "adminEmail": "janith@gmail.com",
+      "createdAt": "2025-11-18T10:35:56.391406",
+      "updatedAt": "2025-11-18T11:09:04.805039",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 1
+}
+
+------------
+/tournaments/{id}/admin-invite/resend
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/3/admin-invite/resend' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDQyMTg4LCJleHAiOjE3NjQzMDYxODh9.LshtjDkdbSX-seu43tLB34rZbv2xdrM1GzaCrVgivakjx-p7zYSm9VQY80vpuKK7vy0m37-IUuhPR2UBXsztzg' \
+  -d ''
+
+
+response
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 2,
+    "recipient": "janith@gmail.com",
+    "subject": "Tournament Admin Invitation: tour01",
+    "body": "Hello janith,\n\nYou have been assigned as the admin for the tournament: tour01.\nDates: 2025-11-17 to 2025-11-20\nVenue: example \n\nPlease log in to manage the tournament details.\n\nRegards,\nSV Backend Service",
+    "status": "FAILED",
+    "errorMessage": "Authentication failed",
+    "sentAt": "2025-11-18T11:14:48.6132175",
+    "tournamentId": null,
+    "userId": null
+  },
+  "httpStatus": 200,
+  "count": 0,
+  "success": true
+}
+
+
+----------
+/tournaments/filter
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/tournaments/filter?name=tour01&status=ONGOING&grade=REGIONAL&startDate=2025-11-17&endDate=2025-11-20&regStartDate=2025-11-17&regEndDate=2025-11-19&page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDUxMzEyLCJleHAiOjE3NjQzMTUzMTJ9._EN30vQJn-kQje2aa81LpGwnCcvJNNof85S10nhJ2-kNUVDbr41hwh40woGX8py7d1u8hmIHuWdZAcJ5z3bD_A'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 3,
+      "name": "tour01",
+      "grade": "REGIONAL",
+      "venue": "example ",
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-20",
+      "regStartDate": "2025-11-17",
+      "regEndDate": "2025-11-19",
+      "status": "ONGOING",
+      "bannerUrl": "https://www.example.com",
+      "adminId": 1,
+      "adminName": "janith",
+      "adminEmail": "janith@gmail.com",
+      "createdAt": "2025-11-18T10:35:56.391406",
+      "updatedAt": "2025-11-18T11:09:04.805039",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 1
+}
+
+--------
+
+***************
+events
+***************
+
+/events
+
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/sv-backend-service/events?tournamentId=4' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "discipline": "Singles",
+  "ageCategory": "U15",
+  "gender": "Male",
+  "weightClass": "50-60",
+  "rounds": 10,
+  "status": "DRAFT",
+  "eventType": "INDIVIDUAL"
+}'
+
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    "id": 10,
+    "discipline": "Singles",
+    "ageCategory": "U15",
+    "gender": "Male",
+    "weightClass": "50-60",
+    "eventType": "INDIVIDUAL",
+    "rounds": 10,
+    "status": "DRAFT",
+    "createdAt": "2025-11-18T21:16:11.8146305",
+    "updatedAt": "2025-11-18T21:16:11.8146305",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "pagination": null,
+  "httpStatus": 200,
+  "count": 0
+}
+
+enums: status - {CANCELLED, REG_CLOSED, LOCKED, COMPLETED, PUBLISHED, DRAFT}, eventType- {INDIVIDUAL, TEAM}
+
+----------
+/events
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/events?page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
+
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 9,
+      "discipline": "KATA",
+      "ageCategory": "12-15",
+      "gender": "FEMALE",
+      "weightClass": "44KG",
+      "eventType": "INDIVIDUAL",
+      "rounds": 0,
+      "status": "DRAFT",
+      "createdAt": "2025-11-18T21:05:17.164741",
+      "updatedAt": "2025-11-18T21:05:17.164741",
+      "createdBy": "whmanoj@gmail.com",
+      "updatedBy": "whmanoj@gmail.com"
+    },
+    {
+      "id": 10,
+      "discipline": "Singles",
+      "ageCategory": "U15",
+      "gender": "Male",
+      "weightClass": "50-60",
+      "eventType": "INDIVIDUAL",
+      "rounds": 10,
+      "status": "DRAFT",
+      "createdAt": "2025-11-18T21:16:11.814631",
+      "updatedAt": "2025-11-18T21:16:11.814631",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 2,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 2
+}
+
+
+----------
+events/{id}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    "id": 10,
+    "discipline": "Singles",
+    "ageCategory": "U15",
+    "gender": "Male",
+    "weightClass": "50-60",
+    "eventType": "INDIVIDUAL",
+    "rounds": 10,
+    "status": "DRAFT",
+    "createdAt": "2025-11-18T21:16:11.814631",
+    "updatedAt": "2025-11-18T21:16:11.814631",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "pagination": null,
+  "httpStatus": 200,
+  "count": 0
+}
+
+-----------
+events/{id}
+
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/10?tournamentId=4' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "discipline": "Singles",
+  "ageCategory": "U15",
+  "gender": "Male",
+  "weightClass": "50-60",
+  "rounds": 10,
+  "status": "DRAFT",
+  "eventType": "TEAM"
+}'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    "id": 10,
+    "discipline": "Singles",
+    "ageCategory": "U15",
+    "gender": "Male",
+    "weightClass": "50-60",
+    "eventType": "TEAM",
+    "rounds": 10,
+    "status": "DRAFT",
+    "createdAt": null,
+    "updatedAt": null,
+    "createdBy": null,
+    "updatedBy": null
+  },
+  "pagination": null,
+  "httpStatus": 200,
+  "count": 0
+}
+
+
+-------------
+/events/{id}/status
+
+curl -X 'PUT' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/10/status?status=PUBLISHED' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    "id": 10,
+    "discipline": "Singles",
+    "ageCategory": "U15",
+    "gender": "Male",
+    "weightClass": "50-60",
+    "eventType": "TEAM",
+    "rounds": 10,
+    "status": "PUBLISHED",
+    "createdAt": "2025-11-18T21:16:11.814631",
+    "updatedAt": "2025-11-18T21:19:46.184717",
+    "createdBy": "bhanukaviraj22@gmail.com",
+    "updatedBy": "bhanukaviraj22@gmail.com"
+  },
+  "pagination": null,
+  "httpStatus": 200,
+  "count": 0
+}
+
+
+----------
+/events/tournament/{tournamentId}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/tournament/4?page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 9,
+      "discipline": "KATA",
+      "ageCategory": "12-15",
+      "gender": "FEMALE",
+      "weightClass": "44KG",
+      "eventType": "INDIVIDUAL",
+      "rounds": 0,
+      "status": "DRAFT",
+      "createdAt": "2025-11-18T21:05:17.164741",
+      "updatedAt": "2025-11-18T21:05:17.164741",
+      "createdBy": "whmanoj@gmail.com",
+      "updatedBy": "whmanoj@gmail.com"
+    },
+    {
+      "id": 10,
+      "discipline": "Singles",
+      "ageCategory": "U15",
+      "gender": "Male",
+      "weightClass": "50-60",
+      "eventType": "TEAM",
+      "rounds": 10,
+      "status": "PUBLISHED",
+      "createdAt": "2025-11-18T21:16:11.814631",
+      "updatedAt": "2025-11-18T21:20:29.213445",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 2,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 2
+}
+
+----------------
+
+/events/status/{status}
+
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/status/PUBLISHED?page=1&limit=10' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
+
+response
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": [
+    {
+      "id": 10,
+      "discipline": "Singles",
+      "ageCategory": "U15",
+      "gender": "Male",
+      "weightClass": "50-60",
+      "eventType": "TEAM",
+      "rounds": 10,
+      "status": "PUBLISHED",
+      "createdAt": "2025-11-18T21:16:11.814631",
+      "updatedAt": "2025-11-18T21:20:29.213445",
+      "createdBy": "bhanukaviraj22@gmail.com",
+      "updatedBy": "bhanukaviraj22@gmail.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalCount": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
+  "httpStatus": 200,
+  "count": 1
+}
+
+--------
+/events/{id}
+
+curl -X 'DELETE' \
+  'http://localhost:8080/api/v1/sv-backend-service/events/1' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzYzNDc2NDg4LCJleHAiOjE3NjQzNDA0ODh9.K5QtVbw29OClG5NJhnUJE5sveh8b14R9gJOjnIQAwL1DlwV7__QsCnZKw9c1LAcN8FFFqcof3uHsS8Vea9pjWQ'
