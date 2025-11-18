@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -16,27 +15,29 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, UploadCloud } from 'lucide-react';
+import { CalendarIcon, UploadCloud, ChevronsUpDown } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Tournament } from '@/app/(root)/tournaments/page';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useUsers } from '@/hooks/api/useUsers';
-import MultiSelect from '../ui/multi-select';
+import type { Tournament, TournamentGrade, TournamentStatus } from '@/types/api/tournaments';
+import { TournamentGrade as TournamentGradeEnum, TournamentStatus as TournamentStatusEnum } from '@/types/api/tournaments';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
-  grade: z.enum(['National', 'Provincial', 'Club']),
+  grade: z.nativeEnum(TournamentGradeEnum),
   venue: z.string().min(2, 'Venue is required.'),
   startDate: z.date({ required_error: 'A start date is required.' }),
   endDate: z.date({ required_error: 'An end date is required.' }),
   registrationStartDate: z.date({ required_error: 'A registration start date is required.' }),
   registrationEndDate: z.date({ required_error: 'A registration end date is required.' }),
-  admin: z.array(z.string()).min(1, 'Please select at least one admin.'),
-  bannerUrl: z.string().url().optional().or(z.literal('')),
+  status: z.nativeEnum(TournamentStatusEnum),
+  adminId: z.number({ required_error: 'Please select an admin.' }),
+  bannerUrl: z.string().url().optional().or(z.literal('')).nullable(),
 }).refine(data => data.endDate >= data.startDate, {
   message: "End date cannot be before start date",
   path: ["endDate"],
@@ -50,8 +51,8 @@ const formSchema = z.object({
 
 type TournamentFormProps = {
   mode: 'view' | 'edit' | 'create';
-  tournament: Omit<Tournament, 'status'> | null;
-  onSave: (data: Omit<Tournament, 'status' | 'id'> & { id?: number }) => void;
+  tournament: Omit<Tournament, 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'adminName' | 'adminEmail'> | null;
+  onSave: (data: any) => void;
 };
 
 export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps) {
@@ -62,35 +63,41 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      grade: 'Club',
-      venue: '',
-      admin: [],
-      bannerUrl: '',
-      ...tournament,
-      admin: tournament?.admin ? [tournament.admin] : [],
+      name: tournament?.name || '',
+      grade: tournament?.grade || TournamentGradeEnum.LOCAL,
+      venue: tournament?.venue || '',
+      startDate: tournament?.startDate || new Date(),
+      endDate: tournament?.endDate || new Date(),
+      registrationStartDate: tournament?.registrationStartDate || new Date(),
+      registrationEndDate: tournament?.registrationEndDate || new Date(),
+      status: tournament?.status || TournamentStatusEnum.SCHEDULED,
+      adminId: tournament?.adminId || 0,
+      bannerUrl: tournament?.bannerUrl || '',
     },
   });
 
   useEffect(() => {
-    const defaultValues = {
-      name: '',
-      grade: 'Club',
-      venue: '',
-      admin: [],
-      bannerUrl: '',
-      ...tournament,
-      admin: tournament?.admin ? [tournament.admin] : [],
-    };
-    form.reset(defaultValues);
-    setImagePreview(defaultValues.bannerUrl || null);
+    if (tournament) {
+      form.reset({
+        name: tournament.name,
+        grade: tournament.grade,
+        venue: tournament.venue,
+        startDate: tournament.startDate,
+        endDate: tournament.endDate,
+        registrationStartDate: tournament.registrationStartDate,
+        registrationEndDate: tournament.registrationEndDate,
+        status: tournament.status,
+        adminId: tournament.adminId,
+        bannerUrl: tournament.bannerUrl,
+      });
+      setImagePreview(tournament.bannerUrl);
+    }
   }, [tournament, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     onSave({
       ...values,
       id: tournament?.id,
-      admin: values.admin.join(', '), // Convert array to string for saving
     });
   }
 
@@ -142,9 +149,11 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="National">National</SelectItem>
-                  <SelectItem value="Provincial">Provincial</SelectItem>
-                  <SelectItem value="Club">Club</SelectItem>
+                  <SelectItem value={TournamentGradeEnum.NATIONAL}>{TournamentGradeEnum.NATIONAL}</SelectItem>
+                  <SelectItem value={TournamentGradeEnum.LOCAL}>{TournamentGradeEnum.LOCAL}</SelectItem>
+                  <SelectItem value={TournamentGradeEnum.INTERNATIONAL}>{TournamentGradeEnum.INTERNATIONAL}</SelectItem>
+                  <SelectItem value={TournamentGradeEnum.REGIONAL}>{TournamentGradeEnum.REGIONAL}</SelectItem>
+                  <SelectItem value={TournamentGradeEnum.ELITE}>{TournamentGradeEnum.ELITE}</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -315,19 +324,78 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
 
         <FormField
           control={form.control}
-          name="admin"
+          name="adminId"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Administrator</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-full justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                      disabled={isViewMode || adminsLoading}
+                    >
+                      {field.value
+                        ? admins.find(
+                          (admin) => admin.id === field.value
+                        )?.name
+                        : adminsLoading ? "Loading administrators..." : "Select administrator"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search administrator..." />
+                    <CommandEmpty>No administrator found.</CommandEmpty>
+                    <CommandGroup>
+                      {adminsLoading ? (
+                        <CommandEmpty>Loading administrators...</CommandEmpty>
+                      ) : (
+                        admins.map((admin) => (
+                          <CommandItem
+                            value={admin.name}
+                            key={admin.id}
+                            onSelect={() => {
+                              form.setValue("adminId", Number(admin.id))
+                            }}
+                          >
+                            {admin.name}
+                          </CommandItem>
+                        ))
+                      )}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Administrator</FormLabel>
-              <FormControl>
-                <MultiSelect
-                    options={adminOptions}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    placeholder={adminsLoading ? 'Loading...' : 'Select administrators...'}
-                    className={isViewMode ? 'pointer-events-none opacity-50' : ''}
-                />
-              </FormControl>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={TournamentStatusEnum.SCHEDULED}>Scheduled</SelectItem>
+                  <SelectItem value={TournamentStatusEnum.ONGOING}>Ongoing</SelectItem>
+                  <SelectItem value={TournamentStatusEnum.FINISHED}>Finished</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -384,4 +452,3 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
   );
 }
 
-    

@@ -37,6 +37,18 @@ export const API_PATHS = {
     UPDATE: (id: string | number) => `/users/${id}`,
     DELETE: (id: string | number) => `/users/${id}`,
   },
+  TOURNAMENTS: {
+    LIST: "/tournaments",
+    GET: (id: string | number) => `/tournaments/${id}`,
+    CREATE: "/tournaments",
+    UPDATE: (id: string | number) => `/tournaments/${id}`,
+    DELETE: (id: string | number) => `/tournaments/${id}`,
+    UPDATE_STATUS: (id: string | number) => `/tournaments/${id}/status`,
+    BY_STATUS: "/tournaments/status",
+    BY_DATE_RANGE: "/tournaments/dates",
+    RESEND_ADMIN_INVITE: (id: string | number) =>
+      `/tournaments/${id}/admin-invite/resend`,
+  },
 } as const;
 
 /**

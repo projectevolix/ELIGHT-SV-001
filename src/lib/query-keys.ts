@@ -90,3 +90,62 @@ export function getUserInvalidationKeys(id?: string | number) {
   }
   return [userKeys.lists(), userKeys.searches()];
 }
+
+/**
+ * Query key factory for tournaments
+ */
+export const tournamentKeys = {
+  all: ["tournaments"] as const,
+  lists: () => [...tournamentKeys.all, "list"] as const,
+  list: (page: number = 1, limit: number = 10) =>
+    [...tournamentKeys.lists(), { page, limit }] as const,
+  details: () => [...tournamentKeys.all, "detail"] as const,
+  detail: (id: string | number | null | undefined) =>
+    id !== null && id !== undefined
+      ? [...tournamentKeys.details(), id]
+      : [...tournamentKeys.details(), "undefined"],
+  byStatus: () => [...tournamentKeys.all, "status"] as const,
+  status: (status: string, page: number = 1, limit: number = 10) =>
+    [...tournamentKeys.byStatus(), { status, page, limit }] as const,
+  byDateRange: () => [...tournamentKeys.all, "dateRange"] as const,
+  dateRange: (
+    startDate: string,
+    endDate: string,
+    page: number = 1,
+    limit: number = 10
+  ) =>
+    [
+      ...tournamentKeys.byDateRange(),
+      { startDate, endDate, page, limit },
+    ] as const,
+} as const;
+
+/**
+ * Helper to invalidate all tournament-related queries
+ * Useful after mutations (create, update, delete, status change)
+ */
+export function getTournamentInvalidationKeys(
+  id?: string | number,
+  status?: string,
+  dateRange?: { startDate: string; endDate: string }
+) {
+  const keys: any[] = [
+    tournamentKeys.lists(),
+    tournamentKeys.byStatus(),
+    tournamentKeys.byDateRange(),
+  ];
+
+  if (id) {
+    keys.push(tournamentKeys.details(), tournamentKeys.detail(id));
+  }
+
+  if (status) {
+    keys.push(tournamentKeys.byStatus());
+  }
+
+  if (dateRange) {
+    keys.push(tournamentKeys.byDateRange());
+  }
+
+  return keys;
+}

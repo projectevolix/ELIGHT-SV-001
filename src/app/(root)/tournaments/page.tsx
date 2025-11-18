@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutGrid, List, Search, ChevronLeft, ChevronRight, MoreVertical, Edit, Trash2, Eye, Settings } from 'lucide-react';
+import { LayoutGrid, List, Search, ChevronLeft, ChevronRight, MoreVertical, Edit, Trash2, Eye, Settings, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,155 +14,29 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TournamentSheet } from '@/components/tournaments/tournament-sheet';
 import { ManageEventsSheet } from '@/components/tournaments/manage-events-sheet';
+import { TournamentCardGridSkeleton, TournamentRowListSkeleton } from '@/components/tournaments/tournament-skeleton';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useTournaments, useTournamentsByStatus } from '@/hooks/api/useTournaments';
+import { useDeleteTournament, useResendAdminInvite } from '@/hooks/api/useTournamentMutations';
+import { useToast } from '@/hooks/use-toast';
+import type { Tournament } from '@/types/api/tournaments';
+import { TournamentStatus } from '@/types/api/tournaments';
 
-export type Tournament = {
-  id: number;
-  name: string;
-  grade: 'National' | 'Provincial' | 'Club';
-  venue: string;
-  startDate: Date;
-  endDate: Date;
-  registrationStartDate: Date;
-  registrationEndDate: Date;
-  admin: string;
-  status: 'Ongoing' | 'Upcoming' | 'Finished';
-  bannerUrl?: string;
-};
-
-const tournamentsData: Tournament[] = [
-  {
-    id: 1,
-    name: 'Summer Championship 2024',
-    grade: 'National',
-    venue: 'North America',
-    startDate: new Date('2024-07-20'),
-    endDate: new Date('2024-08-10'),
-    registrationStartDate: new Date('2024-06-01'),
-    registrationEndDate: new Date('2024-07-01'),
-    admin: 'Andy Vogel',
-    status: 'Ongoing',
-    bannerUrl: 'https://picsum.photos/seed/1/600/400'
-  },
-  {
-    id: 2,
-    name: 'The International 2024',
-    grade: 'Provincial',
-    venue: 'Global',
-    startDate: new Date('2024-09-01'),
-    endDate: new Date('2024-09-15'),
-    registrationStartDate: new Date('2024-07-15'),
-    registrationEndDate: new Date('2024-08-15'),
-    admin: 'Jane Doe',
-    status: 'Upcoming',
-    bannerUrl: 'https://picsum.photos/seed/2/600/400'
-  },
-  {
-    id: 3,
-    name: 'Masters Tokyo',
-    grade: 'Club',
-    venue: 'APAC',
-    startDate: new Date('2024-06-10'),
-    endDate: new Date('2024-06-25'),
-    registrationStartDate: new Date('2024-05-01'),
-    registrationEndDate: new Date('2024-06-01'),
-    admin: 'John Smith',
-    status: 'Finished',
-  },
-  {
-    id: 4,
-    name: 'BLAST Premier: Fall Finals',
-    grade: 'National',
-    venue: 'Europe',
-    startDate: new Date('2024-11-20'),
-    endDate: new Date('2024-11-28'),
-    registrationStartDate: new Date('2024-10-01'),
-    registrationEndDate: new Date('2024-11-01'),
-    admin: 'Andy Vogel',
-    status: 'Upcoming',
-  },
-    {
-    id: 5,
-    name: 'World Cyber Games',
-    grade: 'Provincial',
-    venue: 'Global',
-    startDate: new Date('2024-05-01'),
-    endDate: new Date('2024-05-15'),
-    registrationStartDate: new Date('2024-03-15'),
-    registrationEndDate: new Date('2024-04-15'),
-    admin: 'Jane Doe',
-    status: 'Finished',
-    bannerUrl: 'https://picsum.photos/seed/5/600/400'
-  },
-  {
-    id: 6,
-    name: 'Rocket League Championship',
-    grade: 'National',
-    venue: 'Global',
-    startDate: new Date('2024-07-15'),
-    endDate: new Date('2024-07-30'),
-    registrationStartDate: new Date('2024-06-01'),
-    registrationEndDate: new Date('2024-07-01'),
-    admin: 'John Smith',
-    status: 'Ongoing',
-  },
-  {
-    id: 7,
-    name: 'Fortnite World Cup',
-    grade: 'Club',
-    venue: 'Global',
-    startDate: new Date('2024-08-25'),
-    endDate: new Date('2024-09-05'),
-    registrationStartDate: new Date('2024-07-01'),
-    registrationEndDate: new Date('2024-08-01'),
-    admin: 'Andy Vogel',
-    status: 'Upcoming',
-    bannerUrl: 'https://picsum.photos/seed/7/600/400'
-  },
-  {
-    id: 8,
-    name: 'Overwatch League 2024',
-    grade: 'National',
-    venue: 'Global',
-    startDate: new Date('2024-07-01'),
-    endDate: new Date('2024-09-30'),
-    registrationStartDate: new Date('2024-05-15'),
-    registrationEndDate: new Date('2024-06-15'),
-    admin: 'Jane Doe',
-    status: 'Ongoing',
-    bannerUrl: 'https://picsum.photos/seed/8/600/400'
-  },
-  {
-    id: 9,
-    name: 'Six Invitational',
-    grade: 'Provincial',
-    venue: 'Global',
-    startDate: new Date('2024-02-13'),
-    endDate: new Date('2024-02-25'),
-    registrationStartDate: new Date('2024-01-01'),
-    registrationEndDate: new Date('2024-02-01'),
-    admin: 'John Smith',
-    status: 'Finished',
-  },
-];
-
-const ITEMS_PER_PAGE = 6;
-
-const getStatus = (startDate: Date, endDate: Date): 'Ongoing' | 'Upcoming' | 'Finished' => {
-  const now = new Date();
-  if (now < startDate) return 'Upcoming';
-  if (now > endDate) return 'Finished';
-  return 'Ongoing';
-};
+const ITEMS_PER_PAGE = 10;
 
 export default function TournamentsPage() {
-  const [tournaments, setTournaments] = useState(() => tournamentsData.map(t => ({...t, status: getStatus(t.startDate, t.endDate)})));
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+
+  // URL-based pagination state
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const currentStatus = (searchParams.get('status') || 'all') as string;
+  const searchTerm = searchParams.get('search') || '';
+
   const [view, setView] = useState<'grid' | 'list'>('list');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [manageEventsSheetOpen, setManageEventsSheetOpen] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
@@ -169,60 +44,70 @@ export default function TournamentsPage() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [tournamentToDelete, setTournamentToDelete] = useState<Tournament | null>(null);
 
+  // Fetch tournaments based on status filter
+  const {
+    data: tournamentsData,
+    isPending: isLoading,
+    error: fetchError,
+  } = currentStatus && currentStatus !== 'all'
+      ? useTournamentsByStatus(
+        currentStatus.toUpperCase() as TournamentStatus,
+        currentPage,
+        ITEMS_PER_PAGE
+      )
+      : useTournaments(currentPage, ITEMS_PER_PAGE);
+
+  const tournaments = tournamentsData?.tournaments || [];
+  const pagination = tournamentsData?.pagination;
+
+  const deleteMutation = useDeleteTournament();
+  const resendInviteMutation = useResendAdminInvite();
+
+  // Update URL when filters change
+  const updateURL = useCallback(
+    (page: number = 1, status: string = 'all', search: string = '') => {
+      const params = new URLSearchParams();
+      if (page > 1) params.set('page', page.toString());
+      if (status !== 'all') params.set('status', status);
+      if (search) params.set('search', search);
+
+      const newURL = params.toString() ? `/tournaments?${params.toString()}` : '/tournaments';
+      router.push(newURL);
+    },
+    [router]
+  );
+
+  // Show error toast if fetch fails
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTournaments(prevTournaments =>
-        prevTournaments.map(t => ({
-          ...t,
-          status: getStatus(t.startDate, t.endDate),
-        }))
-      );
-    }, 60000); // Update status every minute
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'Ongoing':
-        return 'default';
-      case 'Upcoming':
-        return 'secondary';
-      case 'Finished':
-        return 'outline';
-      default:
-        return 'default';
+    if (fetchError) {
+      toast({
+        title: 'Failed to load tournaments',
+        description: (fetchError as any)?.message || 'Please try again',
+        variant: 'destructive',
+      });
     }
+  }, [fetchError, toast]);
+
+  const handleStatusChange = (value: string) => {
+    updateURL(1, value, searchTerm);
   };
 
-  const filteredTournaments = useMemo(() => {
-    let filtered = tournaments
-      .filter((t) =>
-        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.venue.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .filter((t) => statusFilter === 'all' || t.status === statusFilter);
+  const handleSearchChange = (value: string) => {
+    updateURL(1, currentStatus, value);
+  };
 
-    if (view === 'grid') {
-      filtered = filtered.filter(t => !!t.bannerUrl);
-    }
-    
-    return filtered;
-  }, [searchTerm, statusFilter, tournaments, view]);
+  const handlePageChange = (newPage: number) => {
+    updateURL(newPage, currentStatus, searchTerm);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  const paginatedTournaments = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredTournaments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredTournaments, currentPage]);
-
-  const totalPages = Math.ceil(filteredTournaments.length / ITEMS_PER_PAGE);
-  
   const handleCreate = () => {
     setSheetMode('create');
     setSelectedTournament(null);
     setSheetOpen(true);
   };
-  
+
   const handleView = (tournament: Tournament) => {
     setSheetMode('view');
     setSelectedTournament(tournament);
@@ -234,7 +119,7 @@ export default function TournamentsPage() {
     setSelectedTournament(tournament);
     setSheetOpen(true);
   };
-  
+
   const handleManageEvents = (tournament: Tournament) => {
     setSelectedTournament(tournament);
     setManageEventsSheetOpen(true);
@@ -247,23 +132,43 @@ export default function TournamentsPage() {
 
   const handleDeleteConfirm = () => {
     if (tournamentToDelete) {
-      setTournaments(tournaments.filter(t => t.id !== tournamentToDelete.id));
+      deleteMutation.mutate(tournamentToDelete.id);
+      setDeleteAlertOpen(false);
+      setTournamentToDelete(null);
     }
-    setDeleteAlertOpen(false);
-    setTournamentToDelete(null);
   };
 
-  const handleSave = (data: Omit<Tournament, 'status'>) => {
-    const status = getStatus(data.startDate, data.endDate);
-    const tournamentWithStatus = { ...data, status };
+  const handleResendInvite = (tournament: Tournament) => {
+    resendInviteMutation.mutate(tournament.id);
+  };
 
-    if (sheetMode === 'create') {
-      setTournaments([...tournaments, { ...tournamentWithStatus, id: Date.now() }]);
-    } else {
-      setTournaments(tournaments.map(t => t.id === data.id ? tournamentWithStatus : t));
-    }
+  const handleSave = (data: any) => {
+    // Handle create/edit mutations here
+    // For now, just close sheet
     setSheetOpen(false);
   };
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case TournamentStatus.ONGOING:
+        return 'default';
+      case TournamentStatus.SCHEDULED:
+        return 'secondary';
+      case TournamentStatus.FINISHED:
+        return 'outline';
+      default:
+        return 'default';
+    }
+  };
+
+  // Filter tournaments by search term (client-side for now, ready for backend search filter)
+  const filteredTournaments = tournaments.filter((t) =>
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.venue.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.adminName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = pagination?.totalPages || 1;
 
 
   return (
@@ -275,31 +180,25 @@ export default function TournamentsPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search tournaments..." 
+            <Input
+              placeholder="Search tournaments..."
               className="pl-10 w-48"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
+              defaultValue={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </div>
-          <Select value={statusFilter} onValueChange={(value) => {
-            setStatusFilter(value)
-            setCurrentPage(1);
-          }}>
+          <Select value={currentStatus} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Ongoing">Ongoing</SelectItem>
-              <SelectItem value="Upcoming">Upcoming</SelectItem>
-              <SelectItem value="Finished">Finished</SelectItem>
+              <SelectItem value={TournamentStatus.SCHEDULED}>Scheduled</SelectItem>
+              <SelectItem value={TournamentStatus.ONGOING}>Ongoing</SelectItem>
+              <SelectItem value={TournamentStatus.FINISHED}>Finished</SelectItem>
             </SelectContent>
           </Select>
-           <div className="flex items-center gap-1 rounded-md bg-muted p-1">
+          <div className="flex items-center gap-1 rounded-md bg-muted p-1">
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
@@ -320,11 +219,23 @@ export default function TournamentsPage() {
           <Button onClick={handleCreate}>Create Tournament</Button>
         </div>
       </div>
-      {view === 'grid' ? (
+      {isLoading ? (
+        view === 'grid' ? (
+          <TournamentCardGridSkeleton count={ITEMS_PER_PAGE} />
+        ) : (
+          <TournamentRowListSkeleton count={ITEMS_PER_PAGE} />
+        )
+      ) : filteredTournaments.length === 0 ? (
+        <Card className="shadow">
+          <CardContent className="pt-8 text-center text-muted-foreground">
+            <p>No tournaments found</p>
+          </CardContent>
+        </Card>
+      ) : view === 'grid' ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {paginatedTournaments.map((tournament) => (
+          {filteredTournaments.map((tournament) => (
             <Card key={tournament.id} className="shadow-lg hover:shadow-xl transition-shadow flex flex-col">
-               {tournament.bannerUrl && (
+              {tournament.bannerUrl && (
                 <div className="relative h-40 w-full">
                   <Image src={tournament.bannerUrl} alt={tournament.name} fill className="object-cover rounded-t-lg" data-ai-hint="tournament banner" />
                 </div>
@@ -342,7 +253,7 @@ export default function TournamentsPage() {
                   <span className="text-sm text-muted-foreground">End Date</span>
                   <span className="font-semibold">{format(tournament.endDate, 'MMM d, yyyy')}</span>
                 </div>
-                 <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Status</span>
                   <Badge variant={getStatusVariant(tournament.status)}>{tournament.status}</Badge>
                 </div>
@@ -385,6 +296,7 @@ export default function TournamentsPage() {
                 <TableHead>Tournament</TableHead>
                 <TableHead>Grade</TableHead>
                 <TableHead>Venue</TableHead>
+                <TableHead>Admin</TableHead>
                 <TableHead>Start Date</TableHead>
                 <TableHead>End Date</TableHead>
                 <TableHead>Status</TableHead>
@@ -392,38 +304,39 @@ export default function TournamentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedTournaments.map((tournament) => (
+              {filteredTournaments.map((tournament) => (
                 <TableRow key={tournament.id} onClick={() => handleView(tournament)} className="cursor-pointer">
                   <TableCell className="font-medium font-headline">{tournament.name}</TableCell>
                   <TableCell>{tournament.grade}</TableCell>
                   <TableCell>{tournament.venue}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{tournament.adminName}</TableCell>
                   <TableCell>{format(tournament.startDate, 'MMM d, yyyy')}</TableCell>
                   <TableCell>{format(tournament.endDate, 'MMM d, yyyy')}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(tournament.status)}>{tournament.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                     <DropdownMenu>
+                    <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleView(tournament)}}>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleView(tournament) }}>
                           <Eye className="mr-2 h-4 w-4" />
                           <span>View</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleEdit(tournament)}}>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(tournament) }}>
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleManageEvents(tournament)}}>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleManageEvents(tournament) }}>
                           <Settings className="mr-2 h-4 w-4" />
                           <span>Manage Events</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleDeleteClick(tournament)}} className="text-destructive">
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(tournament) }} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Delete</span>
                         </DropdownMenuItem>
@@ -438,11 +351,11 @@ export default function TournamentsPage() {
       )}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-6">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={!pagination?.hasPreviousPage || isLoading}
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Previous
@@ -450,19 +363,19 @@ export default function TournamentsPage() {
           <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={!pagination?.hasNextPage || isLoading}
           >
             Next
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
       )}
-      <TournamentSheet 
-        open={sheetOpen} 
+      <TournamentSheet
+        open={sheetOpen}
         onOpenChange={setSheetOpen}
         mode={sheetMode}
         tournament={selectedTournament}
