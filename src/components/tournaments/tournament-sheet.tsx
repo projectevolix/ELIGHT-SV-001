@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
-import { Tournament } from '@/app/(root)/tournaments/page';
+import type { Tournament } from '@/types/api/tournaments';
 import { TournamentForm } from './tournament-form';
 import { TournamentDetails } from './tournament-details';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ type TournamentSheetProps = {
   onOpenChange: (open: boolean) => void;
   mode: 'view' | 'edit' | 'create';
   tournament: Tournament | null;
-  onSave: (data: Omit<Tournament, 'status'>) => void;
+  onSave: (data: any) => void;
 };
 
 export function TournamentSheet({ open, onOpenChange, mode, tournament, onSave }: TournamentSheetProps) {

@@ -18,7 +18,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, UploadCloud, ChevronsUpDown } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
@@ -26,6 +25,7 @@ import Image from 'next/image';
 import { useUsers } from '@/hooks/api/useUsers';
 import type { Tournament, TournamentGrade, TournamentStatus } from '@/types/api/tournaments';
 import { TournamentGrade as TournamentGradeEnum, TournamentStatus as TournamentStatusEnum } from '@/types/api/tournaments';
+import MultiSelect from '../ui/multi-select';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -36,7 +36,7 @@ const formSchema = z.object({
   registrationStartDate: z.date({ required_error: 'A registration start date is required.' }),
   registrationEndDate: z.date({ required_error: 'A registration end date is required.' }),
   status: z.nativeEnum(TournamentStatusEnum),
-  adminId: z.number({ required_error: 'Please select an admin.' }),
+  adminIds: z.array(z.string()).min(1, 'Please select at least one admin.'),
   bannerUrl: z.string().url().optional().or(z.literal('')).nullable(),
 }).refine(data => data.endDate >= data.startDate, {
   message: "End date cannot be before start date",
@@ -51,7 +51,7 @@ const formSchema = z.object({
 
 type TournamentFormProps = {
   mode: 'view' | 'edit' | 'create';
-  tournament: Omit<Tournament, 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'adminName' | 'adminEmail'> | null;
+  tournament: Omit<Tournament, 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'adminName' | 'adminEmail' | 'adminId'> & { adminId?: number, adminIds?: number[] } | null;
   onSave: (data: any) => void;
 };
 
@@ -71,7 +71,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
       registrationStartDate: tournament?.registrationStartDate || new Date(),
       registrationEndDate: tournament?.registrationEndDate || new Date(),
       status: tournament?.status || TournamentStatusEnum.SCHEDULED,
-      adminId: tournament?.adminId || 0,
+      adminIds: tournament?.adminId ? [tournament.adminId.toString()] : (tournament?.adminIds?.map(String) || []),
       bannerUrl: tournament?.bannerUrl || '',
     },
   });
@@ -87,7 +87,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
         registrationStartDate: tournament.registrationStartDate,
         registrationEndDate: tournament.registrationEndDate,
         status: tournament.status,
-        adminId: tournament.adminId,
+        adminIds: tournament.adminId ? [tournament.adminId.toString()] : (tournament.adminIds?.map(String) || []),
         bannerUrl: tournament.bannerUrl,
       });
       setImagePreview(tournament.bannerUrl);
@@ -97,6 +97,7 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
   function onSubmit(values: z.infer<typeof formSchema>) {
     onSave({
       ...values,
+      adminId: parseInt(values.adminIds[0], 10), // For now, backend seems to expect a single adminId
       id: tournament?.id,
     });
   }
@@ -321,62 +322,27 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
             )}
           />
         </div>
-
+        
         <FormField
           control={form.control}
-          name="adminId"
+          name="adminIds"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Administrator</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      disabled={isViewMode || adminsLoading}
-                    >
-                      {field.value
-                        ? admins.find(
-                          (admin) => admin.id === field.value
-                        )?.name
-                        : adminsLoading ? "Loading administrators..." : "Select administrator"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search administrator..." />
-                    <CommandEmpty>No administrator found.</CommandEmpty>
-                    <CommandGroup>
-                      {adminsLoading ? (
-                        <CommandEmpty>Loading administrators...</CommandEmpty>
-                      ) : (
-                        admins.map((admin) => (
-                          <CommandItem
-                            value={admin.name}
-                            key={admin.id}
-                            onSelect={() => {
-                              form.setValue("adminId", Number(admin.id))
-                            }}
-                          >
-                            {admin.name}
-                          </CommandItem>
-                        ))
-                      )}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+            <FormItem>
+              <FormLabel>Administrator(s)</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={adminOptions}
+                  selected={field.value}
+                  onChange={field.onChange}
+                  className="w-full"
+                  placeholder={adminsLoading ? "Loading administrators..." : "Select administrator(s)"}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
 
         <FormField
           control={form.control}
@@ -451,4 +417,3 @@ export function TournamentForm({ mode, tournament, onSave }: TournamentFormProps
     </Form>
   );
 }
-
