@@ -95,7 +95,7 @@ export default function MultiSelect({
 
             <PopoverContent
                 align="start"
-                className="w-[--radix-popover-trigger-width] p-3 space-y-2 pointer-events-auto z-[9999]"
+                className="w-[--radix-popover-trigger-width] p-2 space-y-2 pointer-events-auto z-[9999]"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 {/* Search Input */}
