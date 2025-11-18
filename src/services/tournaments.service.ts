@@ -35,20 +35,15 @@ export async function fetchTournaments(
   params: FetchTournamentsParams,
   client: ApiClient = apiClient
 ): Promise<{ tournaments: Tournament[]; pagination: any }> {
-  const response = await client.get<ListTournamentsResponse>(
+  const response = await client.get<TournamentDTO[]>(
     `${API_PATHS.TOURNAMENTS.LIST}?page=${params.page}&limit=${params.limit}`
   );
 
-  // The API client extracts 'data' from ApiResponse wrapper, so response is the ListTournamentsResponse directly
-  const tournaments = Array.isArray(response)
-    ? mapTournamentDtosToModels(response)
-    : mapTournamentDtosToModels(response.data || []);
-
-  const pagination =
-    !Array.isArray(response) && response.pagination ? response.pagination : {};
+  // API client attaches pagination to array as array.pagination for list responses
+  const pagination = (response as any).pagination || {};
 
   return {
-    tournaments,
+    tournaments: mapTournamentDtosToModels(response),
     pagination,
   };
 }
@@ -73,20 +68,14 @@ export async function fetchTournamentsByStatus(
   params: FetchTournamentsByStatusParams,
   client: ApiClient = apiClient
 ): Promise<{ tournaments: Tournament[]; pagination: any }> {
-  const response = await client.get<ListTournamentsResponse>(
+  const response = await client.get<TournamentDTO[]>(
     `${API_PATHS.TOURNAMENTS.BY_STATUS}/${params.status}?page=${params.page}&limit=${params.limit}`
   );
 
-  // Handle both direct array response and wrapped { data, pagination } response
-  const tournaments = Array.isArray(response)
-    ? mapTournamentDtosToModels(response)
-    : mapTournamentDtosToModels(response.data || []);
-
-  const pagination =
-    !Array.isArray(response) && response.pagination ? response.pagination : {};
+  const pagination = (response as any).pagination || {};
 
   return {
-    tournaments,
+    tournaments: mapTournamentDtosToModels(response),
     pagination,
   };
 }
@@ -99,20 +88,14 @@ export async function fetchTournamentsByDateRange(
   params: FetchTournamentsByDateRangeParams,
   client: ApiClient = apiClient
 ): Promise<{ tournaments: Tournament[]; pagination: any }> {
-  const response = await client.get<ListTournamentsResponse>(
+  const response = await client.get<TournamentDTO[]>(
     `${API_PATHS.TOURNAMENTS.BY_DATE_RANGE}?start=${params.startDate}&end=${params.endDate}&page=${params.page}&limit=${params.limit}`
   );
 
-  // Handle both direct array response and wrapped { data, pagination } response
-  const tournaments = Array.isArray(response)
-    ? mapTournamentDtosToModels(response)
-    : mapTournamentDtosToModels(response.data || []);
-
-  const pagination =
-    !Array.isArray(response) && response.pagination ? response.pagination : {};
+  const pagination = (response as any).pagination || {};
 
   return {
-    tournaments,
+    tournaments: mapTournamentDtosToModels(response),
     pagination,
   };
 }
@@ -183,4 +166,36 @@ export async function resendAdminInvite(
     {}
   );
   return response;
+}
+
+/**
+ * Filter tournaments by multiple criteria
+ */
+export async function filterTournaments(
+  params: any, // FetchTournamentsByFilterParams
+  client: ApiClient = apiClient
+): Promise<{ tournaments: Tournament[]; pagination: any }> {
+  // Build query string from filter params
+  const queryParams = new URLSearchParams();
+  queryParams.append("page", params.page?.toString() || "1");
+  queryParams.append("limit", params.limit?.toString() || "10");
+  if (params.name) queryParams.append("name", params.name);
+  if (params.status) queryParams.append("status", params.status);
+  if (params.grade) queryParams.append("grade", params.grade);
+  if (params.startDate) queryParams.append("startDate", params.startDate);
+  if (params.endDate) queryParams.append("endDate", params.endDate);
+  if (params.regStartDate)
+    queryParams.append("regStartDate", params.regStartDate);
+  if (params.regEndDate) queryParams.append("regEndDate", params.regEndDate);
+
+  const response = await client.get<TournamentDTO[]>(
+    `${API_PATHS.TOURNAMENTS.FILTER}?${queryParams.toString()}`
+  );
+
+  const pagination = (response as any).pagination || {};
+
+  return {
+    tournaments: mapTournamentDtosToModels(response),
+    pagination,
+  };
 }

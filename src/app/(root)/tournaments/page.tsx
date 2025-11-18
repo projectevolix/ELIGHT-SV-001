@@ -19,7 +19,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useTournaments, useTournamentsByStatus } from '@/hooks/api/useTournaments';
-import { useDeleteTournament, useResendAdminInvite } from '@/hooks/api/useTournamentMutations';
+import { useCreateTournament, useUpdateTournament, useDeleteTournament, useResendAdminInvite } from '@/hooks/api/useTournamentMutations';
 import { useToast } from '@/hooks/use-toast';
 import type { Tournament } from '@/types/api/tournaments';
 import { TournamentStatus } from '@/types/api/tournaments';
@@ -62,6 +62,8 @@ export default function TournamentsPage() {
 
   const deleteMutation = useDeleteTournament();
   const resendInviteMutation = useResendAdminInvite();
+  const createMutation = useCreateTournament();
+  const updateMutation = useUpdateTournament();
 
   // Update URL when filters change
   const updateURL = useCallback(
@@ -143,9 +145,44 @@ export default function TournamentsPage() {
   };
 
   const handleSave = (data: any) => {
-    // Handle create/edit mutations here
-    // For now, just close sheet
-    setSheetOpen(false);
+    // Transform dates to ISO strings for API
+    const payload = {
+      name: data.name,
+      grade: data.grade,
+      venue: data.venue,
+      startDate: data.startDate instanceof Date ? data.startDate.toISOString().split('T')[0] : data.startDate,
+      endDate: data.endDate instanceof Date ? data.endDate.toISOString().split('T')[0] : data.endDate,
+      regStartDate: data.registrationStartDate instanceof Date ? data.registrationStartDate.toISOString().split('T')[0] : data.regStartDate,
+      regEndDate: data.registrationEndDate instanceof Date ? data.registrationEndDate.toISOString().split('T')[0] : data.regEndDate,
+      status: data.status,
+      bannerUrl: data.bannerUrl || null,
+      adminId: data.adminId,
+    };
+
+    if (sheetMode === 'create') {
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          setSheetOpen(false);
+          toast({
+            title: "Success",
+            description: "Tournament created successfully",
+          });
+        },
+      });
+    } else if (sheetMode === 'edit' && data.id) {
+      updateMutation.mutate(
+        { id: data.id, data: payload },
+        {
+          onSuccess: () => {
+            setSheetOpen(false);
+            toast({
+              title: "Success",
+              description: "Tournament updated successfully",
+            });
+          },
+        }
+      );
+    }
   };
 
   const getStatusVariant = (status: string) => {

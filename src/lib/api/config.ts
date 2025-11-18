@@ -46,6 +46,7 @@ export const API_PATHS = {
     UPDATE_STATUS: (id: string | number) => `/tournaments/${id}/status`,
     BY_STATUS: "/tournaments/status",
     BY_DATE_RANGE: "/tournaments/dates",
+    FILTER: "/tournaments/filter",
     RESEND_ADMIN_INVITE: (id: string | number) =>
       `/tournaments/${id}/admin-invite/resend`,
   },

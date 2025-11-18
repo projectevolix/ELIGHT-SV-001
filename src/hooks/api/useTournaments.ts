@@ -11,9 +11,14 @@ import {
   fetchTournament,
   fetchTournamentsByStatus,
   fetchTournamentsByDateRange,
+  filterTournaments,
 } from "@/services/tournaments.service";
 import { tournamentKeys } from "@/lib/query-keys";
-import type { Tournament, TournamentStatus } from "@/types/api/tournaments";
+import type {
+  Tournament,
+  TournamentStatus,
+  FetchTournamentsByFilterParams,
+} from "@/types/api/tournaments";
 
 /**
  * Hook for fetching all tournaments with pagination
@@ -69,6 +74,21 @@ export function useTournamentsByDateRange(
     queryFn: () =>
       fetchTournamentsByDateRange({ startDate, endDate, page, limit }),
     enabled: enabled && !!startDate && !!endDate,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+/**
+ * Hook for filtering tournaments by multiple criteria
+ */
+export function useTournamentsByFilter(
+  filters: Partial<FetchTournamentsByFilterParams>,
+  page: number = 1,
+  limit: number = 10
+) {
+  return useQuery({
+    queryKey: tournamentKeys.filter(filters, page, limit),
+    queryFn: () => filterTournaments({ ...filters, page, limit }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

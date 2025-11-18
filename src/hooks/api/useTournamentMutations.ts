@@ -35,9 +35,10 @@ export function useCreateTournament() {
         title: "Success",
         description: "Tournament created successfully",
       });
-      // Invalidate tournament lists to refetch data
-      queryClient.invalidateQueries({
-        queryKey: getTournamentInvalidationKeys(),
+      // Refetch all tournament-related queries to show the new tournament
+      queryClient.refetchQueries({
+        queryKey: ["tournaments"],
+        type: "all",
       });
     },
     onError: (error: any) => {
@@ -70,9 +71,10 @@ export function useUpdateTournament() {
         title: "Success",
         description: "Tournament updated successfully",
       });
-      // Invalidate all tournament queries
-      queryClient.invalidateQueries({
-        queryKey: getTournamentInvalidationKeys(updatedTournament.id),
+      // Refetch all tournament-related queries to show the updated tournament
+      queryClient.refetchQueries({
+        queryKey: ["tournaments"],
+        type: "all",
       });
     },
     onError: (error: any) => {
@@ -105,9 +107,10 @@ export function useUpdateTournamentStatus() {
         title: "Success",
         description: "Tournament status updated successfully",
       });
-      // Invalidate all tournament queries
-      queryClient.invalidateQueries({
-        queryKey: getTournamentInvalidationKeys(updatedTournament.id),
+      // Refetch all tournament-related queries to show the updated status
+      queryClient.refetchQueries({
+        queryKey: ["tournaments"],
+        type: "all",
       });
     },
     onError: (error: any) => {
@@ -134,9 +137,10 @@ export function useDeleteTournament() {
         title: "Success",
         description: "Tournament deleted successfully",
       });
-      // Invalidate tournament lists
-      queryClient.invalidateQueries({
-        queryKey: getTournamentInvalidationKeys(),
+      // Refetch all tournament-related queries to remove the deleted tournament
+      queryClient.refetchQueries({
+        queryKey: ["tournaments"],
+        type: "all",
       });
     },
     onError: (error: any) => {

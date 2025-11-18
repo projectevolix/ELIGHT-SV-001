@@ -167,7 +167,17 @@ class ApiClient {
       }
 
       // Return the data payload (extract from ApiResponse wrapper if present)
-      return ("data" in apiResponse ? apiResponse.data : apiResponse) as T;
+      // For responses with pagination metadata, attach it to the data array
+      if ("data" in apiResponse) {
+        const responseData = apiResponse.data;
+        if (Array.isArray(responseData) && apiResponse.pagination) {
+          // Attach pagination metadata to array for list endpoints
+          (responseData as any).pagination = apiResponse.pagination;
+        }
+        return responseData as T;
+      }
+
+      return apiResponse as T;
     } catch (error) {
       if (error instanceof ApiClientError) {
         throw error;

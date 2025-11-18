@@ -39,8 +39,8 @@ export interface TournamentDTO {
   status: string;
   bannerUrl: string | null;
   adminId: number;
-  adminName: string;
-  adminEmail: string;
+  adminName?: string; // Optional - only in list/detail responses, not in create response
+  adminEmail?: string; // Optional - only in list/detail responses, not in create response
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -190,6 +190,19 @@ export interface FetchTournamentsByDateRangeParams
 }
 
 /**
+ * Query parameters for filtering tournaments (new endpoint)
+ */
+export interface FetchTournamentsByFilterParams extends FetchTournamentsParams {
+  name?: string;
+  status?: TournamentStatus;
+  grade?: TournamentGrade;
+  startDate?: string; // ISO date format YYYY-MM-DD
+  endDate?: string;
+  regStartDate?: string;
+  regEndDate?: string;
+}
+
+/**
  * Mapper: Convert DTO to UI model
  * Handles date parsing and enum conversion
  */
@@ -206,8 +219,8 @@ export function mapTournamentDtoToModel(dto: TournamentDTO): Tournament {
     status: (dto.status as TournamentStatus) || TournamentStatus.SCHEDULED,
     bannerUrl: dto.bannerUrl || null,
     adminId: dto.adminId,
-    adminName: dto.adminName,
-    adminEmail: dto.adminEmail,
+    adminName: dto.adminName || "",
+    adminEmail: dto.adminEmail || "",
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),
     createdBy: dto.createdBy,

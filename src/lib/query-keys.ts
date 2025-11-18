@@ -118,6 +118,12 @@ export const tournamentKeys = {
       ...tournamentKeys.byDateRange(),
       { startDate, endDate, page, limit },
     ] as const,
+  byFilter: () => [...tournamentKeys.all, "filter"] as const,
+  filter: (
+    filters: Record<string, any>,
+    page: number = 1,
+    limit: number = 10
+  ) => [...tournamentKeys.byFilter(), { ...filters, page, limit }] as const,
 } as const;
 
 /**
@@ -133,6 +139,7 @@ export function getTournamentInvalidationKeys(
     tournamentKeys.lists(),
     tournamentKeys.byStatus(),
     tournamentKeys.byDateRange(),
+    tournamentKeys.byFilter(),
   ];
 
   if (id) {
