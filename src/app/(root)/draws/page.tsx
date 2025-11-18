@@ -22,12 +22,12 @@ export default function DrawsPage() {
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
-  const selectedTournament = useMemo(() => 
-    tournamentsData.find(t => t.id === selectedTournamentId) || null, 
+  const selectedTournament = useMemo(() =>
+    tournamentsData.find(t => t.id === selectedTournamentId) || null,
     [selectedTournamentId]
   );
 
-  const selectedEvent = useMemo(() => 
+  const selectedEvent = useMemo(() =>
     eventsData.find(e => e.id === selectedEventId) || null,
     [selectedEventId]
   );
@@ -38,16 +38,16 @@ export default function DrawsPage() {
         <h1 className="text-3xl font-bold font-headline tracking-tight">
           Draws
         </h1>
-        <FilterBar 
+        <FilterBar
           tournaments={tournamentsData}
           events={eventsData}
           onTournamentChange={setSelectedTournamentId}
           onEventChange={setSelectedEventId}
           selectedTournamentId={selectedTournamentId}
         />
-        
+
         {selectedTournament && selectedEvent && (
-          <Bracket 
+          <Bracket
             tournament={selectedTournament}
             event={selectedEvent}
           />
