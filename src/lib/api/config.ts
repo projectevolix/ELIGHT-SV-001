@@ -61,13 +61,22 @@ export const API_PATHS = {
     BY_STATUS: "/events/status",
   },
   COACHES: {
-    LIST: "/api/coaches",
-    GET: (id: string | number) => `/api/coaches/${id}`,
-    CREATE: "/api/coaches",
-    UPDATE: (id: string | number) => `/api/coaches/${id}`,
-    DELETE: (id: string | number) => `/api/coaches/${id}`,
+    LIST: "/coaches",
+    GET: (id: string | number) => `/coaches/${id}`,
+    CREATE: "/coaches",
+    UPDATE: (id: string | number) => `/coaches/${id}`,
+    DELETE: (id: string | number) => `/coaches/${id}`,
     BY_ASSOCIATION: (associationId: string | number) =>
-      `/api/coaches/association/${associationId}`,
+      `/coaches/association/${associationId}`,
+  },
+  PLAYERS: {
+    LIST: "/players",
+    GET: (id: string | number) => `/players/${id}`,
+    CREATE: "/players",
+    UPDATE: (id: string | number) => `/players/${id}`,
+    DELETE: (id: string | number) => `/players/${id}`,
+    BY_ASSOCIATION: (associationId: string | number) =>
+      `/players/association/${associationId}`,
   },
 } as const;
 

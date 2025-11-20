@@ -16,6 +16,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTournaments } from '@/hooks/api/useTournaments';
 import { useEventsByTournament } from '@/hooks/api/useEvents';
+import { usePlayers } from '@/hooks/api/usePlayerQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import MultiSelect from '@/components/ui/multi-select';
 import type { MultiSelectOption } from '@/components/ui/multi-select';
@@ -58,6 +59,10 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
   );
   const events = eventsData || [];
 
+  // Fetch all players with pagination
+  const { data: playersData, isPending: playersLoading } = usePlayers(1, 100);
+  const players = playersData || [];
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     onSave(values);
     form.reset();
@@ -67,14 +72,11 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
     form.reset();
   };
 
-  // Build player options - placeholder for when API comes
-  const playerOptions: MultiSelectOption[] = [
-    { value: '1', label: 'Kasun Perera' },
-    { value: '2', label: 'John Doe' },
-    { value: '3', label: 'Jane Smith' },
-    { value: '4', label: 'Alice Williams' },
-    { value: '5', label: 'Bob Brown' },
-  ];
+  // Build player options from API data
+  const playerOptions: MultiSelectOption[] = players.map(player => ({
+    value: String(player.id),
+    label: `${player.firstName} ${player.lastName}`,
+  }));
 
   // Build event display names from event properties
   const eventOptions = events.map(e => ({
@@ -115,7 +117,7 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
           )}
         />
 
-        {/* Players Multi-Select - Same as Tournament Administrators */}
+        {/* Players Multi-Select - Wired to real API data */}
         <FormField
           control={form.control}
           name="playerIds"
@@ -123,13 +125,17 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
             <FormItem>
               <FormLabel>Players</FormLabel>
               <FormControl>
-                <MultiSelect
-                  options={playerOptions}
-                  selected={field.value}
-                  onChange={field.onChange}
-                  className="w-full"
-                  placeholder="Select players..."
-                />
+                {playersLoading ? (
+                  <Skeleton className="h-10 w-full rounded-md" />
+                ) : (
+                  <MultiSelect
+                    options={playerOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    className="w-full"
+                    placeholder={playerOptions.length === 0 ? "No players available" : "Select players..."}
+                  />
+                )}
               </FormControl>
               <FormMessage />
             </FormItem>

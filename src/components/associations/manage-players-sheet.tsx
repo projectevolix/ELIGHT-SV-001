@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye, Loader2 } from 'lucide-react';
 import type { Association } from '@/types/api/associations';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
@@ -27,23 +27,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { PlayerSheet } from './player-sheet';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { PlayerDetailsDialog } from './player-details-dialog';
+import { usePlayers, usePlayersByAssociation } from '@/hooks/api/usePlayerQueries';
+import { useCreatePlayer, useUpdatePlayer, useDeletePlayer } from '@/hooks/api/usePlayerMutations';
+import type { PlayerDTO } from '@/types/api/players';
 
-
-export type Player = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  dob: Date;
-  weight: number;
-  kyuId: string;
-  photoUrl?: string;
+export type Player = PlayerDTO & {
+  id: string | number;
 };
-
-const initialPlayers: Player[] = [
-  { id: 1, firstName: 'Alice', lastName: 'Williams', dob: new Date('2005-02-10'), weight: 55, kyuId: 'KYU-001', photoUrl: 'https://picsum.photos/seed/player1/40/40' },
-  { id: 2, firstName: 'Bob', lastName: 'Brown', dob: new Date('2006-07-18'), weight: 62, kyuId: 'KYU-002' },
-  { id: 3, firstName: 'Charlie', lastName: 'Davis', dob: new Date('2004-09-25'), weight: 70, kyuId: 'KYU-003', photoUrl: 'https://picsum.photos/seed/player3/40/40' },
-];
 
 type ManagePlayersSheetProps = {
   open: boolean;
@@ -52,13 +42,20 @@ type ManagePlayersSheetProps = {
 };
 
 export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePlayersSheetProps) {
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
   const [playerSheetOpen, setPlayerSheetOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+
+  // React Query hooks for API integration
+  const { data: playersData, isLoading: playersLoading, error: playersError } = usePlayersByAssociation(association?.id ? Number(association.id) : null);
+  const createPlayerMutation = useCreatePlayer();
+  const updatePlayerMutation = useUpdatePlayer();
+  const deletePlayerMutation = useDeletePlayer();
+
+  const players = useMemo(() => playersData || [], [playersData]);
 
 
   const handleCreatePlayer = () => {
@@ -84,23 +81,70 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
   };
 
   const handleDeleteConfirm = () => {
-    if (playerToDelete) {
-      setPlayers(players.filter(c => c.id !== playerToDelete.id));
+    if (playerToDelete && typeof playerToDelete.id === 'number') {
+      deletePlayerMutation.mutate(playerToDelete.id, {
+        onSuccess: () => {
+          setDeleteAlertOpen(false);
+          setPlayerToDelete(null);
+        },
+      });
     }
-    setDeleteAlertOpen(false);
-    setPlayerToDelete(null);
   };
 
   const handleSavePlayer = (data: Omit<Player, 'id'> & { id?: number }) => {
     if (sheetMode === 'create') {
-      setPlayers([...players, { ...data, id: Date.now() } as Player]);
-    } else {
-      setPlayers(players.map(c => c.id === data.id ? { ...data, id: data.id } as Player : c));
+      if (association?.id && typeof association.id === 'number') {
+        createPlayerMutation.mutate(
+          {
+            associationId: association.id,
+            payload: {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.email,
+              gender: data.gender,
+              dob: typeof data.dob === 'string' ? data.dob : (data.dob as Date).toISOString(),
+              weight: data.weight,
+              kyuLevel: data.kyuLevel,
+              photoUrl: data.photoUrl || undefined,
+              associationId: association.id,
+            },
+          },
+          {
+            onSuccess: () => {
+              setPlayerSheetOpen(false);
+            },
+          }
+        );
+      }
+    } else if (data.id && typeof data.id === 'number') {
+      const assocId = (data as any).associationId && typeof (data as any).associationId === 'number'
+        ? (data as any).associationId
+        : 1; // Default fallback
+
+      updatePlayerMutation.mutate(
+        {
+          id: data.id,
+          associationId: assocId,
+          payload: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            gender: data.gender,
+            dob: typeof data.dob === 'string' ? data.dob : (data.dob as Date).toISOString(),
+            weight: data.weight,
+            kyuLevel: data.kyuLevel,
+            photoUrl: data.photoUrl || undefined,
+            associationId: assocId,
+          },
+        },
+        {
+          onSuccess: () => {
+            setPlayerSheetOpen(false);
+          },
+        }
+      );
     }
-    setPlayerSheetOpen(false);
   };
-
-
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -137,52 +181,81 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
                     <TableHead>Last Name</TableHead>
                     <TableHead>Date of Birth</TableHead>
                     <TableHead>Weight (kg)</TableHead>
-                    <TableHead>Kyu ID</TableHead>
+                    <TableHead>Kyu Level</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {players.map((player) => (
-                    <TableRow key={player.id} onClick={() => handleViewPlayer(player)} className="cursor-pointer">
-                      <TableCell>
-                        <Avatar className="h-8 w-8">
-                          {player.photoUrl ? <AvatarImage src={player.photoUrl} alt={`${player.firstName} ${player.lastName}`} data-ai-hint="person face" /> : null}
-                          <AvatarFallback>
-                            <UserCircle className="h-6 w-6 text-muted-foreground" />
-                          </AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-                      <TableCell className="font-medium">{player.firstName}</TableCell>
-                      <TableCell>{player.lastName}</TableCell>
-                      <TableCell>{format(player.dob, 'MMM d, yyyy')}</TableCell>
-                      <TableCell>{player.weight}</TableCell>
-                      <TableCell>{player.kyuId}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewPlayer(player) }}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              <span>View</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditPlayer(player) }}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(player) }} className="text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Delete</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                  {playersLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Loading players...</span>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : playersError || players.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        {playersError ? 'Failed to load players' : 'No players found'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    players.map((player) => (
+                      <TableRow key={player.id} onClick={() => handleViewPlayer(player)} className="cursor-pointer">
+                        <TableCell>
+                          <Avatar className="h-8 w-8">
+                            {player.photoUrl ? <AvatarImage src={player.photoUrl} alt={`${player.firstName} ${player.lastName}`} data-ai-hint="person face" /> : null}
+                            <AvatarFallback>
+                              <UserCircle className="h-6 w-6 text-muted-foreground" />
+                            </AvatarFallback>
+                          </Avatar>
+                        </TableCell>
+                        <TableCell className="font-medium">{player.firstName}</TableCell>
+                        <TableCell>{player.lastName}</TableCell>
+                        <TableCell>
+                          {typeof player.dob === 'string'
+                            ? format(new Date(player.dob), 'MMM d, yyyy')
+                            : player.dob && typeof player.dob === 'object'
+                              ? format(player.dob as Date, 'MMM d, yyyy')
+                              : 'N/A'
+                          }
+                        </TableCell>
+                        <TableCell>{player.weight}</TableCell>
+                        <TableCell>{player.kyuLevel}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => e.stopPropagation()}
+                                disabled={deletePlayerMutation.isPending || updatePlayerMutation.isPending}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewPlayer(player) }}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                <span>View</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditPlayer(player) }}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Edit</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(player) }} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                <span>Delete</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -195,6 +268,7 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
         mode={sheetMode as 'edit' | 'create'}
         player={selectedPlayer}
         onSave={handleSavePlayer}
+        association={association}
       />
       <PlayerDetailsDialog
         open={detailsDialogOpen}

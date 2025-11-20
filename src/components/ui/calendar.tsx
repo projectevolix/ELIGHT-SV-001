@@ -7,7 +7,6 @@ import { DayPicker, DropdownProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -25,7 +24,7 @@ function Calendar({
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption_label: "hidden",
         caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
@@ -60,41 +59,62 @@ function Calendar({
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
         Dropdown: (props: DropdownProps) => {
-          const handleCalendarChange = (
-            value: string,
-          ) => {
-            const newDate = new Date(props.value as unknown as Date);
-            if (props.name === "months") {
-              newDate.setMonth(parseInt(value));
-            } else if (props.name === "years") {
-              newDate.setFullYear(parseInt(value));
+          const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            if (props.onChange) {
+              props.onChange(e);
             }
-            (props.onChange as any)?.(newDate);
           };
 
+          // Generate options based on dropdown type
+          let options: Array<{ value: string | number; label: string }> = [];
+
+          if (props.name === 'months') {
+            // Months: 0-11
+            options = [
+              { value: '0', label: 'January' },
+              { value: '1', label: 'February' },
+              { value: '2', label: 'March' },
+              { value: '3', label: 'April' },
+              { value: '4', label: 'May' },
+              { value: '5', label: 'June' },
+              { value: '6', label: 'July' },
+              { value: '7', label: 'August' },
+              { value: '8', label: 'September' },
+              { value: '9', label: 'October' },
+              { value: '10', label: 'November' },
+              { value: '11', label: 'December' },
+            ];
+          } else if (props.name === 'years') {
+            // Years: generate from 1900 to current year
+            // Get the range from the closest calendar parent (fromYear/toYear)
+            const currentYear = new Date().getFullYear();
+            const fromYear = 1900;
+            const toYear = currentYear;
+
+            for (let year = toYear; year >= fromYear; year--) {
+              options.push({ value: String(year), label: String(year) });
+            }
+          }
+
           return (
-            <Select
-              value={String(props.value)}
-              onValueChange={(value) => {
-                handleCalendarChange(value);
-              }}
+            <select
+              value={String(props.value ?? '')}
+              onChange={handleChange}
+              disabled={(props as any).disabled || false}
+              aria-label={`Select ${props.name}`}
+              className="h-8 w-auto font-medium px-2 py-1 rounded border border-input bg-background text-sm cursor-pointer"
+              style={{ appearance: 'auto' }}
             >
-              <SelectTrigger className="h-8 w-fit font-medium pr-1.5 first:w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
-                {(props as any).options?.map((option: any) => (
-                  <SelectItem
-                    key={option.value}
-                    value={String(option.value)}
-                    disabled={option.disabled}
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )
+              {options.map((option, idx) => (
+                <option
+                  key={`${option.value}-${idx}`}
+                  value={String(option.value)}
+                >
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          );
         },
       }}
       {...props}

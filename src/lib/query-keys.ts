@@ -234,3 +234,42 @@ export function getCoachInvalidationKeys(associationId?: number) {
 
   return keys;
 }
+
+/**
+ * Query key factory for players
+ */
+export const playerKeys = {
+  all: ["players"] as const,
+  lists: () => [...playerKeys.all, "list"] as const,
+  list: (page: number = 1, limit: number = 10) =>
+    [...playerKeys.lists(), { page, limit }] as const,
+  details: () => [...playerKeys.all, "detail"] as const,
+  detail: (id: string | number | null | undefined) =>
+    id !== null && id !== undefined
+      ? [...playerKeys.details(), id]
+      : [...playerKeys.details(), "undefined"],
+  byAssociation: (associationId: number) =>
+    [...playerKeys.all, "association", associationId] as const,
+  byAssociationList: (
+    associationId: number,
+    page: number = 1,
+    limit: number = 10
+  ) => [...playerKeys.byAssociation(associationId), { page, limit }] as const,
+} as const;
+
+/**
+ * Helper to invalidate all player-related queries
+ * Useful after mutations (create, update, delete)
+ */
+export function getPlayerInvalidationKeys(associationId?: number) {
+  const keys: any[] = [playerKeys.lists()];
+
+  if (associationId) {
+    keys.push(
+      playerKeys.byAssociation(associationId),
+      playerKeys.byAssociationList(associationId)
+    );
+  }
+
+  return keys;
+}

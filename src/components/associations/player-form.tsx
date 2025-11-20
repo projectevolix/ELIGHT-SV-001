@@ -14,21 +14,44 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Player } from './manage-players-sheet';
+import type { Association } from '@/types/api/associations';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { KyuLevel, Gender } from '@/types/api/players';
+
+const KYU_LEVELS = [
+  KyuLevel.WHITE_BELT,
+  KyuLevel.YELLOW_BELT,
+  KyuLevel.ORANGE_BELT,
+  KyuLevel.GREEN_BELT,
+  KyuLevel.PURPLE_BELT,
+  KyuLevel.BROWN_BELT,
+  KyuLevel.BLACK_BELT,
+];
+
+const GENDERS = [Gender.MALE, Gender.FEMALE, Gender.OTHER];
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name is required.'),
   lastName: z.string().min(2, 'Last name is required.'),
+  email: z.string().email('Invalid email address.'),
+  gender: z.string().min(1, 'Gender is required.'),
   dob: z.date({ required_error: 'Date of birth is required.' }),
   weight: z.coerce.number().positive('Weight must be a positive number.'),
-  kyuId: z.string().min(2, 'Kyu ID is required.'),
+  kyuLevel: z.string().min(1, 'Kyu level is required.'),
   photoUrl: z.string().url().optional().or(z.literal('')),
 });
 
@@ -37,45 +60,54 @@ type PlayerFormProps = {
   player: Player | null;
   onSave: (data: Omit<Player, 'id'> & { id?: number }) => void;
   onCancel: () => void;
+  association?: Association | null;
 };
 
-export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) {
+export function PlayerForm({ mode, player, onSave, onCancel, association }: PlayerFormProps) {
   const isViewMode = mode === 'view';
   const [imagePreview, setImagePreview] = useState<string | null>(player?.photoUrl || null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      weight: 0,
-      kyuId: '',
-      photoUrl: '',
-      ...player,
+      firstName: player?.firstName || '',
+      lastName: player?.lastName || '',
+      email: player?.email || '',
+      gender: player?.gender || '',
+      weight: player?.weight || 0,
+      kyuLevel: player?.kyuLevel || '',
+      photoUrl: player?.photoUrl || undefined,
       dob: player?.dob ? new Date(player.dob) : undefined,
     },
   });
 
   useEffect(() => {
     const defaultValues = {
-      firstName: '',
-      lastName: '',
-      weight: 0,
-      kyuId: '',
-      photoUrl: '',
-      ...player,
+      firstName: player?.firstName || '',
+      lastName: player?.lastName || '',
+      email: player?.email || '',
+      gender: player?.gender || '',
+      weight: player?.weight || 0,
+      kyuLevel: player?.kyuLevel || '',
+      photoUrl: player?.photoUrl || undefined,
       dob: player?.dob ? new Date(player.dob) : undefined,
     };
-    form.reset(defaultValues);
+    form.reset(defaultValues as any);
     setImagePreview(defaultValues.photoUrl || null);
   }, [player, form]);
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    onSave({
+    const data = {
       ...values,
       id: player?.id,
-    });
+      associationId: player?.associationId || association?.id,
+      createdAt: player?.createdAt,
+      updatedAt: player?.updatedAt,
+      createdBy: player?.createdBy,
+      updatedBy: player?.updatedBy,
+    };
+    onSave(data as any);
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,6 +149,84 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g. Doe" {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="e.g. john@example.com" {...field} disabled={isViewMode} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Gender</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={isViewMode}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {GENDERS.map((gender) => (
+                        <SelectItem key={gender} value={gender}>
+                          {gender}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="kyuLevel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kyu Level</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={isViewMode}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select kyu level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {KYU_LEVELS.map((level) => (
+                        <SelectItem key={level} value={level}>
+                          {level}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -172,19 +282,6 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
                 <FormLabel>Weight (kg)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="e.g. 60" {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="kyuId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kyu ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. KYU-001" {...field} disabled={isViewMode} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

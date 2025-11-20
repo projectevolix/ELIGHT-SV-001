@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { Player } from './manage-players-sheet';
+import type { Association } from '@/types/api/associations';
 import { PlayerForm } from './player-form';
 
 type PlayerSheetProps = {
@@ -17,9 +18,10 @@ type PlayerSheetProps = {
   mode: 'edit' | 'create';
   player: Player | null;
   onSave: (data: Omit<Player, 'id'> & { id?: number }) => void;
+  association?: Association | null;
 };
 
-export function PlayerSheet({ open, onOpenChange, mode, player, onSave }: PlayerSheetProps) {
+export function PlayerSheet({ open, onOpenChange, mode, player, onSave, association }: PlayerSheetProps) {
   const titles = {
     edit: 'Edit Player',
     create: 'Create New Player',
@@ -38,12 +40,13 @@ export function PlayerSheet({ open, onOpenChange, mode, player, onSave }: Player
           <SheetDescription>{descriptions[mode]}</SheetDescription>
         </SheetHeader>
         <div className="py-8">
-            <PlayerForm
-                mode={mode}
-                player={player} 
-                onSave={onSave}
-                onCancel={() => onOpenChange(false)} 
-            />
+          <PlayerForm
+            mode={mode}
+            player={player}
+            onSave={onSave}
+            onCancel={() => onOpenChange(false)}
+            association={association}
+          />
         </div>
       </SheetContent>
     </Sheet>
