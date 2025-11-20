@@ -25,7 +25,7 @@ export async function fetchAllEvents(
  */
 export async function fetchEventById(id: number): Promise<EventDTO> {
   const response = await apiClient.get<EventDTO>(
-    `${API_PATHS.EVENTS.DETAIL}/${id}`
+    `${API_PATHS.EVENTS.DETAIL(id)}`
   );
   return response;
 }
@@ -39,7 +39,7 @@ export async function fetchEventsByTournament(
   limit: number = 10
 ): Promise<EventDTO[]> {
   const response = await apiClient.get<EventDTO[]>(
-    `${API_PATHS.EVENTS.BY_TOURNAMENT}/${tournamentId}?page=${page}&limit=${limit}`
+    `${API_PATHS.EVENTS.BY_TOURNAMENT(tournamentId)}?page=${page}&limit=${limit}`
   );
   return response;
 }
@@ -53,7 +53,7 @@ export async function fetchEventsByStatus(
   limit: number = 10
 ): Promise<EventDTO[]> {
   const response = await apiClient.get<EventDTO[]>(
-    `${API_PATHS.EVENTS.BY_STATUS}/${status}?page=${page}&limit=${limit}`
+    `${API_PATHS.EVENTS.BY_STATUS(status)}?page=${page}&limit=${limit}`
   );
   return response;
 }
@@ -81,7 +81,7 @@ export async function updateEvent(
   payload: UpdateEventPayload
 ): Promise<EventDTO> {
   const response = await apiClient.put<EventDTO>(
-    `${API_PATHS.EVENTS.UPDATE}/${id}?tournamentId=${tournamentId}`,
+    `${API_PATHS.EVENTS.UPDATE(id)}?tournamentId=${tournamentId}`,
     payload
   );
   return response;
@@ -95,7 +95,7 @@ export async function updateEventStatus(
   status: EventStatus
 ): Promise<EventDTO> {
   const response = await apiClient.put<EventDTO>(
-    `${API_PATHS.EVENTS.STATUS}/${id}/status?status=${status}`,
+    `${API_PATHS.EVENTS.STATUS(id)}?status=${status}`,
     {}
   );
   return response;
@@ -105,5 +105,5 @@ export async function updateEventStatus(
  * Delete event
  */
 export async function deleteEvent(id: number): Promise<void> {
-  await apiClient.delete(`${API_PATHS.EVENTS.DELETE}/${id}`);
+  await apiClient.delete(`${API_PATHS.EVENTS.DELETE(id)}`);
 }

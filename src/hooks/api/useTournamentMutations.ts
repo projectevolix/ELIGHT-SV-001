@@ -35,10 +35,10 @@ export function useCreateTournament() {
         title: "Success",
         description: "Tournament created successfully",
       });
-      // Refetch all tournament-related queries to show the new tournament
-      queryClient.refetchQueries({
-        queryKey: ["tournaments"],
-        type: "all",
+      // Invalidate all tournament-related queries to show the new tournament
+      const invalidationKeys = getTournamentInvalidationKeys();
+      invalidationKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
       });
     },
     onError: (error: any) => {
@@ -71,10 +71,10 @@ export function useUpdateTournament() {
         title: "Success",
         description: "Tournament updated successfully",
       });
-      // Refetch all tournament-related queries to show the updated tournament
-      queryClient.refetchQueries({
-        queryKey: ["tournaments"],
-        type: "all",
+      // Invalidate all tournament-related queries to show the updated tournament
+      const invalidationKeys = getTournamentInvalidationKeys(updatedTournament.id);
+      invalidationKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
       });
     },
     onError: (error: any) => {
@@ -107,10 +107,10 @@ export function useUpdateTournamentStatus() {
         title: "Success",
         description: "Tournament status updated successfully",
       });
-      // Refetch all tournament-related queries to show the updated status
-      queryClient.refetchQueries({
-        queryKey: ["tournaments"],
-        type: "all",
+      // Invalidate all tournament-related queries to show the updated status
+      const invalidationKeys = getTournamentInvalidationKeys(updatedTournament.id, updatedTournament.status);
+      invalidationKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
       });
     },
     onError: (error: any) => {
@@ -137,10 +137,10 @@ export function useDeleteTournament() {
         title: "Success",
         description: "Tournament deleted successfully",
       });
-      // Refetch all tournament-related queries to remove the deleted tournament
-      queryClient.refetchQueries({
-        queryKey: ["tournaments"],
-        type: "all",
+      // Invalidate all tournament-related queries to remove the deleted tournament
+      const invalidationKeys = getTournamentInvalidationKeys();
+      invalidationKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
       });
     },
     onError: (error: any) => {

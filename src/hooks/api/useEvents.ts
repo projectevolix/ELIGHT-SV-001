@@ -44,7 +44,7 @@ export function useEventsByTournament(
   return useQuery<EventDTO[]>({
     queryKey: eventKeys.byTournamentList(tournamentId || 0, page, limit),
     queryFn: () => fetchEventsByTournament(tournamentId!, page, limit),
-    enabled: tournamentId !== null && tournamentId !== undefined,
+    enabled: tournamentId !== null && tournamentId !== undefined && tournamentId !== 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
