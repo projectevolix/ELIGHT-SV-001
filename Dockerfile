@@ -13,7 +13,8 @@ WORKDIR /app
 RUN apk add --no-cache dumb-init
 
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/public ./public
+# DELETE the next line because you have no public folder
+# COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 
