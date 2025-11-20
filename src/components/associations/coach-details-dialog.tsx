@@ -2,14 +2,16 @@
 'use client';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from '@/components/ui/sheet';
+import { X } from 'lucide-react';
 import type { Coach } from './manage-coaches-sheet';
-import { CoachForm } from './coach-form';
+import { CoachDetails } from './coach-details';
 
 type CoachDetailsDialogProps = {
   open: boolean;
@@ -20,21 +22,22 @@ type CoachDetailsDialogProps = {
 export function CoachDetailsDialog({ open, onOpenChange, coach }: CoachDetailsDialogProps) {
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Coach Details</DialogTitle>
-          <DialogDescription>Here are the details for this coach.</DialogDescription>
-        </DialogHeader>
-        <div className="py-8">
-            <CoachForm
-                mode="view"
-                coach={coach} 
-                onSave={() => {}} // No save in view mode
-                onCancel={() => onOpenChange(false)} 
-            />
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="sm:max-w-lg overflow-y-auto p-0" showCloseButton={false}>
+        <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetClose>
+        <div className="px-6">
+          <SheetHeader className="mt-6">
+            <SheetTitle>View Coach</SheetTitle>
+            <SheetDescription>Coach information and details</SheetDescription>
+          </SheetHeader>
+          <div className="py-8">
+            <CoachDetails coach={coach} />
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
