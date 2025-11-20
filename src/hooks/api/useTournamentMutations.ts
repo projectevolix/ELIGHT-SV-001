@@ -37,7 +37,7 @@ export function useCreateTournament() {
       });
       // Invalidate all tournament-related queries to show the new tournament
       const invalidationKeys = getTournamentInvalidationKeys();
-      invalidationKeys.forEach(key => {
+      invalidationKeys.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -72,8 +72,10 @@ export function useUpdateTournament() {
         description: "Tournament updated successfully",
       });
       // Invalidate all tournament-related queries to show the updated tournament
-      const invalidationKeys = getTournamentInvalidationKeys(updatedTournament.id);
-      invalidationKeys.forEach(key => {
+      const invalidationKeys = getTournamentInvalidationKeys(
+        updatedTournament.id
+      );
+      invalidationKeys.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -108,8 +110,11 @@ export function useUpdateTournamentStatus() {
         description: "Tournament status updated successfully",
       });
       // Invalidate all tournament-related queries to show the updated status
-      const invalidationKeys = getTournamentInvalidationKeys(updatedTournament.id, updatedTournament.status);
-      invalidationKeys.forEach(key => {
+      const invalidationKeys = getTournamentInvalidationKeys(
+        updatedTournament.id,
+        updatedTournament.status
+      );
+      invalidationKeys.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -139,7 +144,7 @@ export function useDeleteTournament() {
       });
       // Invalidate all tournament-related queries to remove the deleted tournament
       const invalidationKeys = getTournamentInvalidationKeys();
-      invalidationKeys.forEach(key => {
+      invalidationKeys.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },

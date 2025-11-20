@@ -39,7 +39,9 @@ export async function fetchEventsByTournament(
   limit: number = 10
 ): Promise<EventDTO[]> {
   const response = await apiClient.get<EventDTO[]>(
-    `${API_PATHS.EVENTS.BY_TOURNAMENT(tournamentId)}?page=${page}&limit=${limit}`
+    `${API_PATHS.EVENTS.BY_TOURNAMENT(
+      tournamentId
+    )}?page=${page}&limit=${limit}`
   );
   return response;
 }

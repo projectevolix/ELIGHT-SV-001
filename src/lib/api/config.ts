@@ -57,7 +57,8 @@ export const API_PATHS = {
     UPDATE: (id: string | number) => `/events/${id}`,
     DELETE: (id: string | number) => `/events/${id}`,
     STATUS: (id: string | number) => `/events/${id}/status`,
-    BY_TOURNAMENT: (tournamentId: string | number) => `/events/tournament/${tournamentId}`,
+    BY_TOURNAMENT: (tournamentId: string | number) =>
+      `/events/tournament/${tournamentId}`,
     BY_STATUS: (status: string) => `/events/status/${status}`,
   },
   COACHES: {
