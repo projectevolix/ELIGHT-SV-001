@@ -56,13 +56,13 @@ export function CoachForm({ mode, coach, onSave, onCancel, isLoading = false }: 
       slkfId: coach?.slkfId || '',
       wkfId: coach?.wkfId || '',
       photoUrl: coach && 'photo' in coach ? coach.photo : (coach as any)?.photoUrl || '',
-      dob: coach?.dob ? (coach.dob instanceof Date ? coach.dob : new Date(coach.dob as string)) : undefined,
+      dob: (coach && coach.dob) ? (typeof coach.dob === 'object' && (coach.dob as any) instanceof Date ? coach.dob : new Date(coach.dob as string)) : undefined,
     },
   });
 
   useEffect(() => {
     const photoValue = coach && 'photo' in coach ? coach.photo : (coach as any)?.photoUrl || '';
-    const dobValue = coach?.dob ? (coach.dob instanceof Date ? coach.dob : new Date(coach.dob as string)) : undefined;
+    const dobValue = (coach && coach.dob) ? (typeof coach.dob === 'object' && (coach.dob as any) instanceof Date ? coach.dob : new Date(coach.dob as string)) : undefined;
 
     const defaultValues = {
       firstName: coach?.firstName || '',
@@ -173,7 +173,7 @@ export function CoachForm({ mode, coach, onSave, onCancel, isLoading = false }: 
                     onSelect={field.onChange}
                     disabled={(date) => isViewMode || date > new Date() || date < new Date("1900-01-01")}
                     initialFocus
-                    captionLayout="dropdown-nav"
+                    captionLayout="dropdown"
                     fromYear={1900}
                     toYear={new Date().getFullYear()}
                   />

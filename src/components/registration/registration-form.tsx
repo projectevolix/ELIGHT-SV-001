@@ -145,8 +145,8 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
               <FormLabel>Event</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value}
-                disabled={!selectedTournamentId || eventsLoading || (selectedTournamentId && eventOptions.length === 0)}
+                value={field.value || ''}
+                disabled={Boolean(!selectedTournamentId) || eventsLoading || Boolean(selectedTournamentId && eventOptions.length === 0)}
               >
                 <FormControl>
                   <SelectTrigger>

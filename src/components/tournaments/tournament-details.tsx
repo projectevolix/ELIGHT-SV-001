@@ -1,6 +1,6 @@
 'use client';
 
-import { Tournament } from '@/app/(root)/tournaments/page';
+import type { Tournament } from '@/types/api/tournaments';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Shield, Trophy, Users, User, Clock } from 'lucide-react';
 import { format } from 'date-fns';
@@ -72,7 +72,7 @@ export function TournamentDetails({ tournament }: TournamentDetailsProps) {
           label="Registration Ends"
           value={format(new Date(tournament.registrationEndDate), 'MMM d, yyyy')}
         />
-        <DetailItem icon={User} label="Administrator" value={tournament.admin} />
+        <DetailItem icon={User} label="Administrator" value={tournament.adminName} />
       </div>
     </div>
   );

@@ -20,13 +20,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye } from 'lucide-react';
-import { Association } from '@/app/(root)/associations/page';
+import type { Association } from '@/types/api/associations';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { format, parseISO } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { CoachSheet } from './coach-sheet';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { CoachDetailsDialog } from './coach-details-dialog';
+import { CoachDetails } from './coach-details';
 import { useCoachesByAssociation } from '@/hooks/api/useCoaches';
 import { useDeleteCoach } from '@/hooks/api/useCoachMutations';
 import { CoachDTO } from '@/types/api/coaches';
@@ -212,7 +212,7 @@ export function ManageCoachesSheet({ open, onOpenChange, association }: ManageCo
         coach={selectedCoach}
         associationId={association?.id}
       />
-      <CoachDetailsDialog
+      <CoachDetails
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         coach={selectedCoach}

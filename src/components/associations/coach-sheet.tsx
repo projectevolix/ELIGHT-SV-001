@@ -12,13 +12,14 @@ import type { Coach } from './manage-coaches-sheet';
 import { CoachForm } from './coach-form';
 import { useCreateCoach, useUpdateCoach } from '@/hooks/api/useCoachMutations';
 import { CreateCoachPayload, UpdateCoachPayload } from '@/types/api/coaches';
+import type { EntityId } from '@/types/api/common';
 
 type CoachSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'edit' | 'create';
   coach: Coach | null;
-  associationId?: number;
+  associationId?: EntityId;
 };
 
 export function CoachSheet({ open, onOpenChange, mode, coach, associationId }: CoachSheetProps) {
@@ -48,7 +49,7 @@ export function CoachSheet({ open, onOpenChange, mode, coach, associationId }: C
         slkfId: data.slkfId,
         wkfId: data.wkfId,
       };
-      createMutation.mutate({ associationId, payload }, {
+      createMutation.mutate({ associationId: typeof associationId === 'string' ? parseInt(associationId, 10) : associationId, payload }, {
         onSuccess: () => {
           onOpenChange(false);
         },
@@ -63,7 +64,7 @@ export function CoachSheet({ open, onOpenChange, mode, coach, associationId }: C
         slkfId: data.slkfId,
         wkfId: data.wkfId,
       };
-      updateMutation.mutate({ id: coach.id, associationId, payload }, {
+      updateMutation.mutate({ id: coach.id, associationId: typeof associationId === 'string' ? parseInt(associationId, 10) : associationId, payload }, {
         onSuccess: () => {
           onOpenChange(false);
         },

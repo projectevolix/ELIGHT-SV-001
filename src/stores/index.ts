@@ -2,7 +2,7 @@
 export { useAuthStore } from "./auth.store";
 
 // UI Store - Sheet, modal, and dialog state management
-export { useUiStore } from "./ui.store";
+export { useUIStore } from "./ui.store";
 
 // Filters Store - Search, pagination, and sorting state
 export { useFiltersStore } from "./filters.store";

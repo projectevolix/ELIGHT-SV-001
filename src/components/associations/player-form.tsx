@@ -40,156 +40,156 @@ type PlayerFormProps = {
 };
 
 export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) {
-    const isViewMode = mode === 'view';
-    const [imagePreview, setImagePreview] = useState<string | null>(player?.photoUrl || null);
+  const isViewMode = mode === 'view';
+  const [imagePreview, setImagePreview] = useState<string | null>(player?.photoUrl || null);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            weight: 0,
-            kyuId: '',
-            photoUrl: '',
-            ...player,
-            dob: player?.dob ? new Date(player.dob) : undefined,
-        },
-    });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      weight: 0,
+      kyuId: '',
+      photoUrl: '',
+      ...player,
+      dob: player?.dob ? new Date(player.dob) : undefined,
+    },
+  });
 
-    useEffect(() => {
-        const defaultValues = {
-            firstName: '',
-            lastName: '',
-            weight: 0,
-            kyuId: '',
-            photoUrl: '',
-            ...player,
-            dob: player?.dob ? new Date(player.dob) : undefined,
-        };
-        form.reset(defaultValues);
-        setImagePreview(defaultValues.photoUrl || null);
-    }, [player, form]);
-
-
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        onSave({
-            ...values,
-            id: player?.id,
-        });
-    }
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const dataUrl = reader.result as string;
-            setImagePreview(dataUrl);
-            form.setValue('photoUrl', dataUrl, { shouldValidate: true });
-        };
-        reader.readAsDataURL(file);
-        }
+  useEffect(() => {
+    const defaultValues = {
+      firstName: '',
+      lastName: '',
+      weight: 0,
+      kyuId: '',
+      photoUrl: '',
+      ...player,
+      dob: player?.dob ? new Date(player.dob) : undefined,
     };
+    form.reset(defaultValues);
+    setImagePreview(defaultValues.photoUrl || null);
+  }, [player, form]);
+
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    onSave({
+      ...values,
+      id: player?.id,
+    });
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setImagePreview(dataUrl);
+        form.setValue('photoUrl', dataUrl, { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
-            <FormField
+          <FormField
             control={form.control}
             name="firstName"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                    <Input placeholder="e.g. John" {...field} disabled={isViewMode}/>
+                  <Input placeholder="e.g. John" {...field} disabled={isViewMode} />
                 </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-            <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                    <Input placeholder="e.g. Doe" {...field} disabled={isViewMode}/>
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-        </div>
-        
-        <FormField
-            control={form.control}
-            name="dob"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date of Birth</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild disabled={isViewMode}>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => isViewMode || date > new Date() || date < new Date("1900-01-01")}
-                      initialFocus
-                      captionLayout="dropdown-nav"
-                      fromYear={1900}
-                      toYear={new Date().getFullYear()}
-                    />
-                  </PopoverContent>
-                </Popover>
                 <FormMessage />
               </FormItem>
             )}
           />
-        
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. Doe" {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="dob"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Date of Birth</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild disabled={isViewMode}>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => isViewMode || date > new Date() || date < new Date("1900-01-01")}
+                    initialFocus
+                    captionLayout="dropdown"
+                    fromYear={1900}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-2 gap-4">
-             <FormField
-              control={form.control}
-              name="weight"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Weight (kg)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g. 60" {...field} disabled={isViewMode}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="kyuId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kyu ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. KYU-001" {...field} disabled={isViewMode}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Weight (kg)</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="e.g. 60" {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="kyuId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kyu ID</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. KYU-001" {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <FormField
@@ -200,23 +200,23 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
               <FormLabel>Photo</FormLabel>
               {isViewMode ? (
                 imagePreview ? (
-                    <div className="relative w-32 h-32">
-                        <Image src={imagePreview} alt="Player Photo" fill objectFit="cover" className="rounded-lg" />
-                    </div>
+                  <div className="relative w-32 h-32">
+                    <Image src={imagePreview} alt="Player Photo" fill objectFit="cover" className="rounded-lg" />
+                  </div>
                 ) : <p className="text-sm text-muted-foreground">No photo.</p>
               ) : (
                 <FormControl>
-                   <div className="flex flex-col items-center justify-center w-full">
+                  <div className="flex flex-col items-center justify-center w-full">
                     <label
                       htmlFor="dropzone-file-player"
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
                     >
                       {imagePreview ? (
                         <div className="relative w-full h-full">
-                           <Image src={imagePreview} alt="Photo Preview" fill objectFit="cover" className="rounded-lg" />
-                           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
-                              Click or drag file to replace
-                           </div>
+                          <Image src={imagePreview} alt="Photo Preview" fill objectFit="cover" className="rounded-lg" />
+                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-center p-2 rounded-lg">
+                            Click or drag file to replace
+                          </div>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -236,12 +236,12 @@ export function PlayerForm({ mode, player, onSave, onCancel }: PlayerFormProps) 
             </FormItem>
           )}
         />
-        
+
         {!isViewMode && (
-            <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-                <Button type="submit">Save</Button>
-            </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button type="submit">Save</Button>
+          </div>
         )}
       </form>
     </Form>

@@ -89,8 +89,6 @@ export function ReactQueryProvider({ children }: ReactQueryProviderProps) {
     return (
         <QueryClientProvider
             client={queryClient}
-            // Disable strict mode double invocation in development
-            options={{ shouldDehydrateQuery: () => true }}
         >
             {children}
         </QueryClientProvider>

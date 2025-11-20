@@ -53,7 +53,7 @@ import {
   useUpdateEventStatus,
 } from '@/hooks/api/useEventMutations';
 import { EventDTO, EventStatus } from '@/types/api/events';
-import { Tournament } from '@/app/(root)/tournaments/page';
+import type { Tournament } from '@/types/api/tournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { z } from 'zod';

@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreVertical, Edit, Trash2, PlusCircle, UserCircle, X, Eye } from 'lucide-react';
-import { Association } from '@/app/(root)/associations/page';
+import type { Association } from '@/types/api/associations';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";

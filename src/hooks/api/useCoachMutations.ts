@@ -8,6 +8,7 @@ import {
   updateCoach,
   deleteCoach,
 } from "@/services/coaches.service";
+import type { EntityId } from "@/types/api/common";
 import {
   CoachDTO,
   CreateCoachPayload,
@@ -102,9 +103,9 @@ export function useDeleteCoach() {
       id,
       associationId,
     }: {
-      id: number;
-      associationId: number;
-    }) => deleteCoach(id),
+      id: EntityId;
+      associationId: EntityId;
+    }) => deleteCoach(id as number),
     onSuccess: (_, { id, associationId }) => {
       toast({
         title: "Success",
@@ -113,7 +114,7 @@ export function useDeleteCoach() {
       });
       // Refetch coaches for this association
       queryClient.refetchQueries({
-        queryKey: coachKeys.byAssociation(associationId),
+        queryKey: coachKeys.byAssociation(associationId as number),
         type: "all",
       });
     },
