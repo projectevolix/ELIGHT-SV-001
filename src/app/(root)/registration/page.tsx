@@ -8,99 +8,97 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { PlusCircle, Loader2 } from 'lucide-react';
 import { RegistrationSheet } from '@/components/registration/registration-sheet';
-
-// Mock data
-const tournaments = [
-    { id: '1', name: 'Summer Championship 2024' },
-    { id: '2', name: 'The International 2024' },
-    { id: '3', name: 'Masters Tokyo' },
-];
-
-const events = [
-    { id: '1', name: 'U19 - Male - Singles (58 - 68 kg)', tournamentId: '1' },
-    { id: '2', name: 'U19 - Female - Doubles (53 - 57 kg)', tournamentId: '1' },
-    { id: '3', name: 'Senior - Mixed - Mixed Doubles (90+ kg)', tournamentId: '2' },
-];
-
-type Registration = {
-    id: number;
-    playerName: string;
-    tournamentId: string;
-    eventId: string;
-    status: 'Pending' | 'Approved' | 'Declined';
-};
-
-const initialRegistrations: Registration[] = [
-    { id: 1, playerName: 'Nipun Silva', tournamentId: '1', eventId: '1', status: 'Pending' },
-    { id: 2, playerName: 'John Doe', tournamentId: '1', eventId: '1', status: 'Approved' },
-    { id: 3, playerName: 'Jane Smith', tournamentId: '1', eventId: '2', status: 'Pending' },
-    { id: 4, playerName: 'Alice Williams', tournamentId: '2', eventId: '3', status: 'Approved' },
-    { id: 5, playerName: 'Bob Brown', tournamentId: '2', eventId: '3', status: 'Declined' },
-    { id: 6, playerName: 'Kasun Perera', tournamentId: '1', eventId: '1', status: 'Approved' },
-];
-
+import { useRegistrations, useRegistrationsByTournament } from '@/hooks/api/useRegistrationQueries';
+import { useTournaments } from '@/hooks/api/useTournaments';
+import { useUpdateRegistrationStatus } from '@/hooks/api/useRegistrationMutations';
+import { useCreateRegistration } from '@/hooks/api/useRegistrationMutations';
+import { RegistrationStatus } from '@/types/api/registrations';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function RegistrationPage() {
-    const [registrations, setRegistrations] = useState<Registration[]>(initialRegistrations);
     const [filteredTournament, setFilteredTournament] = useState<string>('all');
-    const [filteredEvent, setFilteredEvent] = useState<string>('all');
     const [sheetOpen, setSheetOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [rejectAlertOpen, setRejectAlertOpen] = useState(false);
+    const [selectedRegistrationForReject, setSelectedRegistrationForReject] = useState<any>(null);
 
-    const availableEvents = useMemo(() => {
-        if (filteredTournament === 'all') {
-            return events;
-        }
-        return events.filter(e => e.tournamentId === filteredTournament);
-    }, [filteredTournament]);
+    // Fetch tournaments
+    const { data: tournamentsData, isPending: tournamentsLoading } = useTournaments(1, 100);
+    const tournaments = tournamentsData?.tournaments || [];
 
-    const filteredRegistrations = useMemo(() => {
-        return registrations.filter(r => {
-            const tournamentMatch = filteredTournament === 'all' || r.tournamentId === filteredTournament;
-            const eventMatch = filteredEvent === 'all' || r.eventId === filteredEvent;
-            return tournamentMatch && eventMatch;
-        });
-    }, [registrations, filteredTournament, filteredEvent]);
+    // Fetch registrations
+    const tournamentIdFilter = filteredTournament === 'all' ? null : parseInt(filteredTournament, 10);
+    const { data: allRegistrations, isPending: allRegsLoading } = useRegistrations(1, 100);
+    const { data: filteredRegs, isPending: filteredRegsLoading } = useRegistrationsByTournament(
+        tournamentIdFilter,
+        1,
+        100
+    );
+
+    const registrations = filteredTournament === 'all' ? allRegistrations : filteredRegs;
+    const isLoadingRegs = filteredTournament === 'all' ? allRegsLoading : filteredRegsLoading;
+
+    // Mutations
+    const updateStatusMutation = useUpdateRegistrationStatus();
+    const createRegistrationMutation = useCreateRegistration();
 
     const approvedCount = useMemo(() => {
-        return filteredRegistrations.filter(r => r.status === 'Approved').length;
-    }, [filteredRegistrations]);
+        return registrations?.filter(r => r.status === 'APPROVED').length || 0;
+    }, [registrations]);
 
-    const handleStatusChange = (id: number, status: 'Approved' | 'Declined') => {
-        setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+    const handleStatusChange = async (id: number, status: 'APPROVED' | 'REJECTED') => {
+        updateStatusMutation.mutate({ id, status: status as RegistrationStatus });
+    };
+
+    const handleRejectClick = (registration: any) => {
+        setSelectedRegistrationForReject(registration);
+        setRejectAlertOpen(true);
+    };
+
+    const handleRejectConfirm = () => {
+        if (selectedRegistrationForReject) {
+            handleStatusChange(selectedRegistrationForReject.id, 'REJECTED');
+            setRejectAlertOpen(false);
+            setSelectedRegistrationForReject(null);
+        }
     };
 
     const handleSaveRegistration = async (data: any) => {
         setIsLoading(true);
         try {
-            console.log('New Registration:', data);
-            const newRegistration: Registration = {
-                id: Date.now(),
-                playerName: `Player ${Date.now()}`,
-                tournamentId: data.tournamentId,
-                eventId: data.eventId,
-                status: 'Pending',
-            };
-            // In a real app, you would get the player name from the data
-            // For now, we add a placeholder.
-            setRegistrations(prev => [newRegistration, ...prev]);
+            createRegistrationMutation.mutate({
+                tournamentId: parseInt(data.tournamentId),
+                playerId: parseInt(data.playerId),
+                eventId: parseInt(data.eventId),
+                status: RegistrationStatus.PENDING,
+                registeredBy: data.registeredBy,
+            });
             setSheetOpen(false);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const getStatusVariant = (status: Registration['status']) => {
+    const getStatusVariant = (status: string) => {
         switch (status) {
-            case 'Approved': return 'secondary';
-            case 'Pending': return 'default';
-            case 'Declined': return 'destructive';
+            case 'APPROVED': return 'secondary';
+            case 'PENDING': return 'default';
+            case 'REJECTED': return 'destructive';
             default: return 'outline';
         }
     };
-
 
     return (
         <DashboardLayout>
@@ -123,25 +121,17 @@ export default function RegistrationPage() {
                     <div className="flex items-center gap-4 mb-6 flex-wrap">
                         <div className="flex items-center gap-2">
                             <label className="text-sm font-medium">Tournament</label>
-                            <Select value={filteredTournament} onValueChange={setFilteredTournament}>
+                            <Select value={filteredTournament} onValueChange={setFilteredTournament} disabled={tournamentsLoading}>
                                 <SelectTrigger className="w-[240px]">
-                                    <SelectValue placeholder="All Tournaments" />
+                                    <SelectValue placeholder={tournamentsLoading ? "Loading..." : "All Tournaments"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Tournaments</SelectItem>
-                                    {tournaments.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm font-medium">Event</label>
-                            <Select value={filteredEvent} onValueChange={setFilteredEvent} disabled={availableEvents.length === 0}>
-                                <SelectTrigger className="w-[240px]">
-                                    <SelectValue placeholder="All Events" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Events</SelectItem>
-                                    {availableEvents.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                                    {tournaments.map(t => (
+                                        <SelectItem key={t.id} value={t.id.toString()}>
+                                            {t.name}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -162,36 +152,56 @@ export default function RegistrationPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredRegistrations.map(reg => (
-                                    <TableRow key={reg.id}>
-                                        <TableCell className="font-medium">{reg.playerName}</TableCell>
-                                        <TableCell>{tournaments.find(t => t.id === reg.tournamentId)?.name}</TableCell>
-                                        <TableCell>{events.find(e => e.id === reg.eventId)?.name}</TableCell>
-                                        <TableCell>
-                                            <Badge variant={getStatusVariant(reg.status)}>{reg.status}</Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex gap-2 justify-end">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() => handleStatusChange(reg.id, 'Approved')}
-                                                    disabled={reg.status === 'Approved'}
-                                                >
-                                                    Approve
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
-                                                    onClick={() => handleStatusChange(reg.id, 'Declined')}
-                                                >
-                                                    Decline
-                                                </Button>
-                                            </div>
+                                {isLoadingRegs ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center py-8">
+                                            <Loader2 className="mx-auto h-6 w-6 animate-spin" />
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                ) : !registrations || registrations.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                            No registrations found
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    registrations.map(reg => (
+                                        <TableRow key={reg.id}>
+                                            <TableCell className="font-medium">
+                                                {reg.player.firstName} {reg.player.lastName}
+                                            </TableCell>
+                                            <TableCell>{reg.tournament.name}</TableCell>
+                                            <TableCell>
+                                                {reg.event.ageCategory} - {reg.event.gender} - {reg.event.discipline}
+                                                {reg.event.weightClass && ` (${reg.event.weightClass})`}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={getStatusVariant(reg.status)}>{reg.status}</Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex gap-2 justify-end">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleStatusChange(reg.id, 'APPROVED')}
+                                                        disabled={reg.status === 'APPROVED' || updateStatusMutation.isPending}
+                                                    >
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+                                                        onClick={() => handleRejectClick(reg)}
+                                                        disabled={updateStatusMutation.isPending}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
                         </Table>
                     </div>
@@ -206,6 +216,30 @@ export default function RegistrationPage() {
                 onSave={handleSaveRegistration}
                 isLoading={isLoading}
             />
+            <AlertDialog open={rejectAlertOpen} onOpenChange={setRejectAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Reject Registration?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to reject the registration for{' '}
+                            <span className="font-semibold">
+                                {selectedRegistrationForReject?.player.firstName}{' '}
+                                {selectedRegistrationForReject?.player.lastName}
+                            </span>
+                            ? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleRejectConfirm}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Reject
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </DashboardLayout>
     );
 }

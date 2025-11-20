@@ -273,3 +273,69 @@ export function getPlayerInvalidationKeys(associationId?: number) {
 
   return keys;
 }
+
+/**
+ * Query key factory for registrations
+ */
+export const registrationKeys = {
+  all: ["registrations"] as const,
+  lists: () => [...registrationKeys.all, "list"] as const,
+  list: (page: number = 1, limit: number = 10) =>
+    [...registrationKeys.lists(), { page, limit }] as const,
+  details: () => [...registrationKeys.all, "detail"] as const,
+  detail: (id: string | number | null | undefined) =>
+    id !== null && id !== undefined
+      ? [...registrationKeys.details(), id]
+      : [...registrationKeys.details(), "undefined"],
+  byTournament: (tournamentId: number) =>
+    [...registrationKeys.all, "tournament", tournamentId] as const,
+  byTournamentList: (
+    tournamentId: number,
+    page: number = 1,
+    limit: number = 10
+  ) =>
+    [...registrationKeys.byTournament(tournamentId), { page, limit }] as const,
+  byPlayer: (playerId: number) =>
+    [...registrationKeys.all, "player", playerId] as const,
+  byPlayerList: (playerId: number, page: number = 1, limit: number = 10) =>
+    [...registrationKeys.byPlayer(playerId), { page, limit }] as const,
+  byEvent: (eventId: number) =>
+    [...registrationKeys.all, "event", eventId] as const,
+  byEventList: (eventId: number, page: number = 1, limit: number = 10) =>
+    [...registrationKeys.byEvent(eventId), { page, limit }] as const,
+} as const;
+
+/**
+ * Helper to invalidate all registration-related queries
+ * Useful after mutations (create, update, delete, status change)
+ */
+export function getRegistrationInvalidationKeys(
+  tournamentId?: number,
+  playerId?: number,
+  eventId?: number
+) {
+  const keys: any[] = [registrationKeys.lists()];
+
+  if (tournamentId) {
+    keys.push(
+      registrationKeys.byTournament(tournamentId),
+      registrationKeys.byTournamentList(tournamentId)
+    );
+  }
+
+  if (playerId) {
+    keys.push(
+      registrationKeys.byPlayer(playerId),
+      registrationKeys.byPlayerList(playerId)
+    );
+  }
+
+  if (eventId) {
+    keys.push(
+      registrationKeys.byEvent(eventId),
+      registrationKeys.byEventList(eventId)
+    );
+  }
+
+  return keys;
+}

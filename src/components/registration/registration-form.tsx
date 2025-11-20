@@ -17,18 +17,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTournaments } from '@/hooks/api/useTournaments';
 import { useEventsByTournament } from '@/hooks/api/useEvents';
 import { usePlayers } from '@/hooks/api/usePlayerQueries';
+import { useCurrentUser } from '@/hooks/api/useUsers';
 import { Skeleton } from '@/components/ui/skeleton';
-import MultiSelect from '@/components/ui/multi-select';
-import type { MultiSelectOption } from '@/components/ui/multi-select';
 
 const formSchema = z.object({
   tournamentId: z.string({ required_error: 'Please select a tournament.' }),
-  playerIds: z.array(z.string()).min(1, 'Please select at least one player.'),
+  playerId: z.string({ required_error: 'Please select a player.' }),
   eventId: z.string({ required_error: 'Please select an event.' }),
 });
 
 type RegistrationFormProps = {
-  onSave: (data: z.infer<typeof formSchema>) => void;
+  onSave: (data: any) => void;
   onCancel: () => void;
   isLoading?: boolean;
 };
@@ -38,10 +37,13 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
     resolver: zodResolver(formSchema),
     defaultValues: {
       tournamentId: '',
-      playerIds: [],
+      playerId: '',
       eventId: '',
     },
   });
+
+  // Fetch current user for registeredBy
+  const { data: currentUser, isPending: userLoading } = useCurrentUser();
 
   // Fetch tournaments list
   const { data: tournamentsData, isPending: tournamentsLoading } = useTournaments(1, 100);
@@ -64,7 +66,12 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
   const players = playersData || [];
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    onSave(values);
+    // Add registeredBy from current user
+    const registeredByName = currentUser?.name || 'Unknown';
+    onSave({
+      ...values,
+      registeredBy: registeredByName,
+    });
     form.reset();
   }
 
@@ -73,8 +80,8 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
   };
 
   // Build player options from API data
-  const playerOptions: MultiSelectOption[] = players.map(player => ({
-    value: String(player.id),
+  const playerOptions = players.map(player => ({
+    id: player.id,
     label: `${player.firstName} ${player.lastName}`,
   }));
 
@@ -83,6 +90,16 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
     id: e.id,
     name: `${e.ageCategory} - ${e.gender} - ${e.discipline}${e.weightClass ? ` (${e.weightClass})` : ''}`
   }));
+
+  if (userLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-full rounded-md" />
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -117,26 +134,37 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
           )}
         />
 
-        {/* Players Multi-Select - Wired to real API data */}
+        {/* Player Selector */}
         <FormField
           control={form.control}
-          name="playerIds"
+          name="playerId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Players</FormLabel>
-              <FormControl>
-                {playersLoading ? (
-                  <Skeleton className="h-10 w-full rounded-md" />
-                ) : (
-                  <MultiSelect
-                    options={playerOptions}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    className="w-full"
-                    placeholder={playerOptions.length === 0 ? "No players available" : "Select players..."}
-                  />
-                )}
-              </FormControl>
+              <FormLabel>Player</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={playersLoading}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={playersLoading ? "Loading players..." : "Select a player"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {playersLoading ? (
+                    <div className="p-2 text-sm text-muted-foreground">Loading players...</div>
+                  ) : playerOptions.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">No players available</div>
+                  ) : (
+                    playerOptions.map(player => (
+                      <SelectItem key={player.id} value={player.id.toString()}>
+                        {player.label}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -211,7 +239,7 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Saving...' : 'Save Registration'}
+            {isLoading ? 'Saving...' : 'Register Player'}
           </Button>
         </div>
       </form>
