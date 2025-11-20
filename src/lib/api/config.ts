@@ -78,6 +78,19 @@ export const API_PATHS = {
     BY_ASSOCIATION: (associationId: string | number) =>
       `/players/association/${associationId}`,
   },
+  REGISTRATIONS: {
+    LIST: "/registrations",
+    GET: (id: string | number) => `/registrations/${id}`,
+    CREATE: "/registrations",
+    UPDATE: (id: string | number) => `/registrations/${id}`,
+    UPDATE_STATUS: (id: string | number) => `/registrations/${id}/status`,
+    DELETE: (id: string | number) => `/registrations/${id}`,
+    BY_TOURNAMENT: (tournamentId: string | number) =>
+      `/registrations/tournament/${tournamentId}`,
+    BY_PLAYER: (playerId: string | number) =>
+      `/registrations/player/${playerId}`,
+    BY_EVENT: (eventId: string | number) => `/registrations/event/${eventId}`,
+  },
 } as const;
 
 /**
