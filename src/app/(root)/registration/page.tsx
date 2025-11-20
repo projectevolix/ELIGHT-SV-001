@@ -47,6 +47,7 @@ export default function RegistrationPage() {
     const [filteredTournament, setFilteredTournament] = useState<string>('all');
     const [filteredEvent, setFilteredEvent] = useState<string>('all');
     const [sheetOpen, setSheetOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const availableEvents = useMemo(() => {
         if (filteredTournament === 'all') {
@@ -71,19 +72,24 @@ export default function RegistrationPage() {
         setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
     };
 
-    const handleSaveRegistration = (data: any) => {
-        console.log('New Registration:', data);
-        const newRegistration: Registration = {
-            id: Date.now(),
-            playerName: `Player ${Date.now()}`,
-            tournamentId: data.tournamentId,
-            eventId: data.eventId,
-            status: 'Pending',
-        };
-        // In a real app, you would get the player name from the data
-        // For now, we add a placeholder.
-        setRegistrations(prev => [newRegistration, ...prev]);
-        setSheetOpen(false);
+    const handleSaveRegistration = async (data: any) => {
+        setIsLoading(true);
+        try {
+            console.log('New Registration:', data);
+            const newRegistration: Registration = {
+                id: Date.now(),
+                playerName: `Player ${Date.now()}`,
+                tournamentId: data.tournamentId,
+                eventId: data.eventId,
+                status: 'Pending',
+            };
+            // In a real app, you would get the player name from the data
+            // For now, we add a placeholder.
+            setRegistrations(prev => [newRegistration, ...prev]);
+            setSheetOpen(false);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const getStatusVariant = (status: Registration['status']) => {
@@ -194,7 +200,12 @@ export default function RegistrationPage() {
                     </p>
                 </CardContent>
             </Card>
-            <RegistrationSheet open={sheetOpen} onOpenChange={setSheetOpen} onSave={handleSaveRegistration} />
+            <RegistrationSheet
+                open={sheetOpen}
+                onOpenChange={setSheetOpen}
+                onSave={handleSaveRegistration}
+                isLoading={isLoading}
+            />
         </DashboardLayout>
     );
 }

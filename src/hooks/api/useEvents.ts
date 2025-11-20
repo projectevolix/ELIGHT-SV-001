@@ -37,13 +37,14 @@ export function useEventById(id: number | null | undefined) {
  * Fetch events for a specific tournament
  */
 export function useEventsByTournament(
-  tournamentId: number,
+  tournamentId: number | null,
   page: number = 1,
   limit: number = 10
 ) {
   return useQuery<EventDTO[]>({
-    queryKey: eventKeys.byTournamentList(tournamentId, page, limit),
-    queryFn: () => fetchEventsByTournament(tournamentId, page, limit),
+    queryKey: eventKeys.byTournamentList(tournamentId || 0, page, limit),
+    queryFn: () => fetchEventsByTournament(tournamentId!, page, limit),
+    enabled: tournamentId !== null && tournamentId !== undefined,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
