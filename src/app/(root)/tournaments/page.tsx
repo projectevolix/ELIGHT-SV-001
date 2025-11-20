@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -24,9 +24,12 @@ import { useToast } from '@/hooks/use-toast';
 import type { Tournament } from '@/types/api/tournaments';
 import { TournamentStatus } from '@/types/api/tournaments';
 
+// Disable static prerendering for this page since it uses useSearchParams
+export const dynamic = 'force-dynamic';
+
 const ITEMS_PER_PAGE = 10;
 
-export default function TournamentsPage() {
+function TournamentsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -439,5 +442,13 @@ export default function TournamentsPage() {
         </AlertDialogContent>
       </AlertDialog>
     </DashboardLayout>
+  );
+}
+
+export default function TournamentsPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div className="flex items-center justify-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div></DashboardLayout>}>
+      <TournamentsContent />
+    </Suspense>
   );
 }
