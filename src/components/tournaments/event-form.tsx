@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MultiSelect from '@/components/ui/multi-select';
 import { EventDTO, EventStatus, EventType, Discipline } from '@/types/api/events';
 import { useEffect } from 'react';
 
@@ -93,23 +93,28 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         <FormField
           control={form.control}
           name="discipline"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Discipline</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+          render={({ field }) => {
+            const disciplineOptions = [
+              { value: Discipline.KATA, label: 'KATA' },
+              { value: Discipline.KUMITE, label: 'KUMITE' },
+            ];
+            return (
+              <FormItem>
+                <FormLabel>Discipline</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a discipline" />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={disciplineOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder="Select a discipline"
+                    disabled={isLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value={Discipline.KATA}>KATA</SelectItem>
-                  <SelectItem value={Discipline.KUMITE}>KUMITE</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="grid grid-cols-2 gap-4">
@@ -129,23 +134,28 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
           <FormField
             control={form.control}
             name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+            render={({ field }) => {
+              const genderOptions = [
+                { value: 'Male', label: 'Male' },
+                { value: 'Female', label: 'Female' },
+              ];
+              return (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
+                    <MultiSelect
+                      options={genderOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      mode="single"
+                      placeholder="Select gender"
+                      disabled={isLoading}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
         </div>
 
@@ -167,23 +177,28 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
           <FormField
             control={form.control}
             name="eventType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Event Type</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+            render={({ field }) => {
+              const eventTypeOptions = [
+                { value: EventType.INDIVIDUAL, label: 'Individual' },
+                { value: EventType.TEAM, label: 'Team' },
+              ];
+              return (
+                <FormItem>
+                  <FormLabel>Event Type</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select event type" />
-                    </SelectTrigger>
+                    <MultiSelect
+                      options={eventTypeOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      mode="single"
+                      placeholder="Select event type"
+                      disabled={isLoading}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={EventType.INDIVIDUAL}>Individual</SelectItem>
-                    <SelectItem value={EventType.TEAM}>Team</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           <FormField
             control={form.control}
@@ -221,27 +236,32 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         <FormField
           control={form.control}
           name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+          render={({ field }) => {
+            const statusOptions = [
+              { value: EventStatus.DRAFT, label: 'DRAFT' },
+              { value: EventStatus.PUBLISHED, label: 'PUBLISHED' },
+              { value: EventStatus.COMPLETED, label: 'COMPLETED' },
+              { value: EventStatus.LOCKED, label: 'LOCKED' },
+              { value: EventStatus.REG_CLOSED, label: 'REG_CLOSED' },
+              { value: EventStatus.CANCELLED, label: 'CANCELLED' },
+            ];
+            return (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={statusOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder="Select a status"
+                    disabled={isLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value={EventStatus.DRAFT}>DRAFT</SelectItem>
-                  <SelectItem value={EventStatus.PUBLISHED}>PUBLISHED</SelectItem>
-                  <SelectItem value={EventStatus.COMPLETED}>COMPLETED</SelectItem>
-                  <SelectItem value={EventStatus.LOCKED}>LOCKED</SelectItem>
-                  <SelectItem value={EventStatus.REG_CLOSED}>REG_CLOSED</SelectItem>
-                  <SelectItem value={EventStatus.CANCELLED}>CANCELLED</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="flex justify-end gap-2 pt-4">

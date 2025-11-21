@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MultiSelect from '@/components/ui/multi-select';
 import { useTournaments } from '@/hooks/api/useTournaments';
 import { useEventsByTournament } from '@/hooks/api/useEvents';
 import { usePlayers } from '@/hooks/api/usePlayerQueries';
@@ -108,114 +109,92 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false }: Regist
         <FormField
           control={form.control}
           name="tournamentId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tournament</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={tournamentsLoading}
-              >
+          render={({ field }) => {
+            const tournamentOptions = tournaments.map(t => ({
+              value: t.id.toString(),
+              label: t.name,
+            }));
+            return (
+              <FormItem>
+                <FormLabel>Tournament</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={tournamentsLoading ? "Loading tournaments..." : "Select a tournament"} />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={tournamentOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder={tournamentsLoading ? "Loading tournaments..." : "Select a tournament"}
+                    disabled={tournamentsLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  {tournaments.map(t => (
-                    <SelectItem key={t.id} value={t.id.toString()}>
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         {/* Player Selector */}
         <FormField
           control={form.control}
           name="playerId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Player</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={playersLoading}
-              >
+          render={({ field }) => {
+            const playerSelectOptions = playerOptions.map(p => ({
+              value: p.id.toString(),
+              label: p.label,
+            }));
+            return (
+              <FormItem>
+                <FormLabel>Player</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={playersLoading ? "Loading players..." : "Select a player"} />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={playerSelectOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder={playersLoading ? "Loading players..." : "Select a player"}
+                    disabled={playersLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  {playersLoading ? (
-                    <div className="p-2 text-sm text-muted-foreground">Loading players...</div>
-                  ) : playerOptions.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">No players available</div>
-                  ) : (
-                    playerOptions.map(player => (
-                      <SelectItem key={player.id} value={player.id.toString()}>
-                        {player.label}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         {/* Event Selector - Conditional on tournament selection */}
         <FormField
           control={form.control}
           name="eventId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Event</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value || ''}
-                disabled={Boolean(!selectedTournamentId) || eventsLoading || Boolean(selectedTournamentId && eventOptions.length === 0)}
-              >
+          render={({ field }) => {
+            const eventSelectOptions = eventOptions.map(e => ({
+              value: e.id.toString(),
+              label: e.name,
+            }));
+            return (
+              <FormItem>
+                <FormLabel>Event</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        !selectedTournamentId
-                          ? "Select a tournament first"
-                          : eventsLoading
-                            ? "Loading events..."
-                            : eventOptions.length === 0
-                              ? "No events"
-                              : "Select an event"
-                      }
-                    />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={eventSelectOptions}
+                    selected={field.value || ''}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder={
+                      !selectedTournamentId
+                        ? "Select a tournament first"
+                        : eventsLoading
+                          ? "Loading events..."
+                          : eventOptions.length === 0
+                            ? "No events"
+                            : "Select an event"
+                    }
+                    disabled={Boolean(!selectedTournamentId) || eventsLoading || Boolean(selectedTournamentId && eventOptions.length === 0)}
+                  />
                 </FormControl>
-                <SelectContent>
-                  {eventOptions.length > 0 ? (
-                    eventOptions.map(e => (
-                      <SelectItem key={e.id} value={e.id.toString()}>
-                        {e.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    selectedTournamentId && !eventsLoading && (
-                      <div className="p-2 text-sm text-muted-foreground text-center">
-                        No events available
-                      </div>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="flex justify-end gap-4 pt-4">

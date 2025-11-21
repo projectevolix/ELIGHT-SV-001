@@ -420,6 +420,7 @@ function TournamentsContent() {
         mode={sheetMode}
         tournament={selectedTournament}
         onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
       <ManageEventsSheet
         open={manageEventsSheetOpen}
