@@ -350,12 +350,12 @@ function TournamentsContent() {
             <TableHeader>
               <TableRow>
                 <TableHead>Tournament</TableHead>
-                <TableHead>Register</TableHead>
                 <TableHead>Venue</TableHead>
                 <TableHead>Admin</TableHead>
                 <TableHead>Start Date</TableHead>
                 <TableHead>End Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead>Register</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -363,6 +363,13 @@ function TournamentsContent() {
               {filteredTournaments.map((tournament) => (
                 <TableRow key={tournament.id} onClick={() => handleView(tournament)} className="cursor-pointer">
                   <TableCell className="font-medium font-headline">{tournament.name}</TableCell>
+                  <TableCell>{tournament.venue}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{tournament.adminName}</TableCell>
+                  <TableCell>{format(tournament.startDate, 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{format(tournament.endDate, 'MMM d, yyyy')}</TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant={getStatusVariant(tournament.status)}>{tournament.status}</Badge>
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="sm"
@@ -371,13 +378,6 @@ function TournamentsContent() {
                     >
                       Register
                     </Button>
-                  </TableCell>
-                  <TableCell>{tournament.venue}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{tournament.adminName}</TableCell>
-                  <TableCell>{format(tournament.startDate, 'MMM d, yyyy')}</TableCell>
-                  <TableCell>{format(tournament.endDate, 'MMM d, yyyy')}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(tournament.status)}>{tournament.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
