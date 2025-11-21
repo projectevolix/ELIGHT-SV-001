@@ -299,7 +299,6 @@ export function ManageEventsSheet({
                     <TableHead>Gender</TableHead>
                     <TableHead>Weight Class</TableHead>
                     <TableHead>Event Type</TableHead>
-                    <TableHead>Rounds</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -308,14 +307,14 @@ export function ManageEventsSheet({
                   {isLoading ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <TableRow key={i}>
-                        <TableCell colSpan={8}>
+                        <TableCell colSpan={7}>
                           <Skeleton className="h-4 w-full" />
                         </TableCell>
                       </TableRow>
                     ))
                   ) : paginatedEvents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                         {searchTerm || statusFilter !== 'all'
                           ? 'No events match your filters.'
                           : 'No events yet. Create one to get started.'}
@@ -329,7 +328,6 @@ export function ManageEventsSheet({
                         <TableCell>{event.gender}</TableCell>
                         <TableCell>{event.weightClass}</TableCell>
                         <TableCell>{event.eventType}</TableCell>
-                        <TableCell>{event.rounds}</TableCell>
                         <TableCell>
                           <Badge variant={getStatusVariant(event.status)}>
                             {event.status}
