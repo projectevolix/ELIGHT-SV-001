@@ -16,7 +16,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MultiSelect from '@/components/ui/multi-select';
 import { useTournaments } from '@/hooks/api/useTournaments';
-import { useEventsByTournament } from '@/hooks/api/useEvents';
+import { useEventsByTournamentWithSelectedPlayers } from '@/hooks/api/useEvents';
 import { usePlayers } from '@/hooks/api/usePlayerQueries';
 import { useCurrentUser } from '@/hooks/api/useUsers';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,11 +55,10 @@ export function RegistrationForm({ onSave, onCancel, isLoading = false, preSelec
   const selectedTournamentId = form.watch('tournamentId');
   const tournamentId = selectedTournamentId ? parseInt(selectedTournamentId, 10) : null;
 
-  // Fetch events for selected tournament
-  const { data: eventsData, isPending: eventsLoading } = useEventsByTournament(
+  // Fetch events for selected tournament with selected players count
+  const { data: eventsData, isPending: eventsLoading } = useEventsByTournamentWithSelectedPlayers(
     tournamentId,
-    1,
-    100
+    1
   );
   const events = eventsData || [];
 
