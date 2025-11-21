@@ -34,14 +34,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import MultiSelect from '@/components/ui/multi-select';
 import { MoreVertical, Edit, Trash2, PlusCircle, Search, ChevronLeft, ChevronRight, Eye, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { EventSheet } from './event-sheet';
@@ -231,10 +225,19 @@ export function ManageEventsSheet({
     setCurrentPage(1); // Reset to first page on search
   };
 
-  const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value);
+  const handleStatusFilterChange = (value: string | string[]) => {
+    const status = Array.isArray(value) ? value[0] : value;
+    setStatusFilter(status);
     setCurrentPage(1); // Reset to first page on filter change
   };
+
+  const statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    ...Object.values(EventStatus).map(status => ({
+      value: status,
+      label: status,
+    })),
+  ];
 
   if (!tournament) return null;
 
@@ -264,19 +267,14 @@ export function ManageEventsSheet({
                   onChange={(e) => handleSearchChange(e.target.value)}
                 />
               </div>
-              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  {Object.values(EventStatus).map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MultiSelect
+                options={statusOptions}
+                selected={statusFilter}
+                onChange={handleStatusFilterChange}
+                mode="single"
+                placeholder="Filter by status"
+                className="w-[150px]"
+              />
               <Button onClick={handleCreateEvent} disabled={isLoading}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Create Event

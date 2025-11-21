@@ -14,13 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MultiSelect from '@/components/ui/multi-select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
@@ -174,63 +168,55 @@ export function PlayerForm({ mode, player, onSave, onCancel, association }: Play
           <FormField
             control={form.control}
             name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={isViewMode}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {GENDERS.map((gender) => (
-                        <SelectItem key={gender} value={gender}>
-                          {gender}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const genderOptions = GENDERS.map(g => ({
+                value: g,
+                label: g,
+              }));
+              return (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={genderOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      mode="single"
+                      placeholder="Select gender"
+                      disabled={isViewMode}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           <FormField
             control={form.control}
             name="kyuLevel"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kyu Level</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={isViewMode}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select kyu level" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {KYU_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const kyuOptions = KYU_LEVELS.map(level => ({
+                value: level,
+                label: level,
+              }));
+              return (
+                <FormItem>
+                  <FormLabel>Kyu Level</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={kyuOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      mode="single"
+                      placeholder="Select kyu level"
+                      disabled={isViewMode}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
         </div>
 

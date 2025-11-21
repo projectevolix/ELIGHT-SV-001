@@ -17,7 +17,6 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, UploadCloud, ChevronsUpDown } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
@@ -36,7 +35,7 @@ const formSchema = z.object({
   registrationStartDate: z.date({ required_error: 'A registration start date is required.' }),
   registrationEndDate: z.date({ required_error: 'A registration end date is required.' }),
   status: z.nativeEnum(TournamentStatusEnum),
-  adminIds: z.array(z.string()).min(1, 'Please select at least one admin.'),
+  adminId: z.string().min(1, 'Please select an admin.'),
   bannerUrl: z.string().url().optional().or(z.literal('')).nullable(),
 }).refine(data => data.endDate >= data.startDate, {
   message: "End date cannot be before start date",
@@ -72,7 +71,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
       registrationStartDate: tournament?.registrationStartDate || new Date(),
       registrationEndDate: tournament?.registrationEndDate || new Date(),
       status: tournament?.status || TournamentStatusEnum.SCHEDULED,
-      adminIds: tournament?.adminId ? [tournament.adminId.toString()] : (tournament?.adminIds?.map(String) || []),
+      adminId: tournament?.adminId ? tournament.adminId.toString() : '',
       bannerUrl: tournament?.bannerUrl || '',
     },
   });
@@ -88,7 +87,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
         registrationStartDate: tournament.registrationStartDate,
         registrationEndDate: tournament.registrationEndDate,
         status: tournament.status,
-        adminIds: tournament.adminId ? [tournament.adminId.toString()] : (tournament.adminIds?.map(String) || []),
+        adminId: tournament.adminId ? tournament.adminId.toString() : '',
         bannerUrl: tournament.bannerUrl,
       });
       setImagePreview(tournament.bannerUrl);
@@ -98,7 +97,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
   function onSubmit(values: z.infer<typeof formSchema>) {
     onSave({
       ...values,
-      adminId: parseInt(values.adminIds[0], 10), // For now, backend seems to expect a single adminId
+      adminId: parseInt(values.adminId, 10),
       id: tournament?.id,
     });
   }
@@ -141,26 +140,31 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
         <FormField
           control={form.control}
           name="grade"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Grade</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode || isLoading}>
+          render={({ field }) => {
+            const gradeOptions = [
+              { value: TournamentGradeEnum.NATIONAL, label: TournamentGradeEnum.NATIONAL },
+              { value: TournamentGradeEnum.LOCAL, label: TournamentGradeEnum.LOCAL },
+              { value: TournamentGradeEnum.INTERNATIONAL, label: TournamentGradeEnum.INTERNATIONAL },
+              { value: TournamentGradeEnum.REGIONAL, label: TournamentGradeEnum.REGIONAL },
+              { value: TournamentGradeEnum.ELITE, label: TournamentGradeEnum.ELITE },
+            ];
+            return (
+              <FormItem>
+                <FormLabel>Grade</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a grade" />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={gradeOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder="Select a grade"
+                    disabled={isViewMode || isLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value={TournamentGradeEnum.NATIONAL}>{TournamentGradeEnum.NATIONAL}</SelectItem>
-                  <SelectItem value={TournamentGradeEnum.LOCAL}>{TournamentGradeEnum.LOCAL}</SelectItem>
-                  <SelectItem value={TournamentGradeEnum.INTERNATIONAL}>{TournamentGradeEnum.INTERNATIONAL}</SelectItem>
-                  <SelectItem value={TournamentGradeEnum.REGIONAL}>{TournamentGradeEnum.REGIONAL}</SelectItem>
-                  <SelectItem value={TournamentGradeEnum.ELITE}>{TournamentGradeEnum.ELITE}</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <FormField
@@ -207,6 +211,9 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       onSelect={field.onChange}
                       disabled={(date) => isViewMode || isLoading || date < new Date("1900-01-01")}
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear() + 10}
                     />
                   </PopoverContent>
                 </Popover>
@@ -243,6 +250,9 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       onSelect={field.onChange}
                       disabled={(date) => isViewMode || isLoading || date < (form.getValues('registrationStartDate') || new Date("1900-01-01"))}
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear() + 10}
                     />
                   </PopoverContent>
                 </Popover>
@@ -282,6 +292,9 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       onSelect={field.onChange}
                       disabled={(date) => isViewMode || isLoading || date < (form.getValues('registrationEndDate') || new Date("1900-01-01"))}
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear() + 10}
                     />
                   </PopoverContent>
                 </Popover>
@@ -319,6 +332,9 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       onSelect={field.onChange}
                       disabled={(date) => isViewMode || isLoading || date < (form.getValues('startDate') || new Date("1900-01-01"))}
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear() + 10}
                     />
                   </PopoverContent>
                 </Popover>
@@ -330,17 +346,19 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
 
         <FormField
           control={form.control}
-          name="adminIds"
+          name="adminId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Administrator(s)</FormLabel>
+              <FormLabel>Administrator</FormLabel>
               <FormControl>
                 <MultiSelect
                   options={adminOptions}
                   selected={field.value}
                   onChange={field.onChange}
+                  mode="single"
                   className="w-full"
-                  placeholder={adminsLoading ? "Loading administrators..." : "Select administrator(s)"}
+                  placeholder={adminsLoading ? "Loading administrators..." : "Select administrator"}
+                  disabled={isViewMode || isLoading}
                 />
               </FormControl>
               <FormMessage />
@@ -352,24 +370,29 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
         <FormField
           control={form.control}
           name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode || isLoading}>
+          render={({ field }) => {
+            const statusOptions = [
+              { value: TournamentStatusEnum.SCHEDULED, label: 'Scheduled' },
+              { value: TournamentStatusEnum.ONGOING, label: 'Ongoing' },
+              { value: TournamentStatusEnum.FINISHED, label: 'Finished' },
+            ];
+            return (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
+                  <MultiSelect
+                    options={statusOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    mode="single"
+                    placeholder="Select status"
+                    disabled={isViewMode || isLoading}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value={TournamentStatusEnum.SCHEDULED}>Scheduled</SelectItem>
-                  <SelectItem value={TournamentStatusEnum.ONGOING}>Ongoing</SelectItem>
-                  <SelectItem value={TournamentStatusEnum.FINISHED}>Finished</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
 
@@ -417,7 +440,11 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
           )}
         />
 
-        {!isViewMode && <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save'}</Button>}
+        {!isViewMode && (
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? 'Saving...' : 'Save Tournament'}
+          </Button>
+        )}
       </form>
     </Form>
   );

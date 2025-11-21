@@ -19,10 +19,12 @@ export type MultiSelectOption = {
 
 interface MultiSelectProps {
     options: MultiSelectOption[]
-    selected: string[]
-    onChange: (selected: string[]) => void
+    selected: string[] | string
+    onChange: (selected: string[] | string) => void
     className?: string
     placeholder?: string
+    mode?: 'single' | 'multi'
+    disabled?: boolean
 }
 
 export default function MultiSelect({
@@ -30,25 +32,45 @@ export default function MultiSelect({
     selected,
     onChange,
     className,
-    placeholder = "Select options..."
+    placeholder = "Select options...",
+    mode = 'multi',
+    disabled = false
 }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false)
     const [search, setSearch] = React.useState("")
+
+    // Normalize selected to array for internal use
+    const selectedArray = Array.isArray(selected) ? selected : (selected ? [selected] : [])
 
     const filteredOptions = options.filter((opt) =>
         opt.label.toLowerCase().includes(search.toLowerCase())
     )
 
     const toggleSelect = (value: string) => {
-        if (selected.includes(value)) {
-            onChange(selected.filter((i) => i !== value))
+        if (mode === 'single') {
+            // Single mode: replace selection or clear if same item clicked
+            if (selectedArray.includes(value)) {
+                onChange('')
+            } else {
+                onChange(value)
+            }
+            setOpen(false) // Close popover after selection
         } else {
-            onChange([...selected, value])
+            // Multi mode: toggle selection
+            if (selectedArray.includes(value)) {
+                onChange(selectedArray.filter((i) => i !== value))
+            } else {
+                onChange([...selectedArray, value])
+            }
         }
     }
 
     const handleUnselect = (value: string) => {
-        onChange(selected.filter((i) => i !== value))
+        if (mode === 'single') {
+            onChange('')
+        } else {
+            onChange(selectedArray.filter((i) => i !== value))
+        }
     }
 
     return (
@@ -58,32 +80,41 @@ export default function MultiSelect({
                     variant="outline"
                     aria-expanded={open}
                     onClick={() => setOpen(!open)}
+                    disabled={disabled}
                     className={cn(
                         "w-full justify-between min-h-10 h-auto",
                         className
                     )}
                 >
                     <div className="flex flex-wrap gap-1">
-                        {selected.length > 0 ? (
-                            selected.map((value) => {
-                                const opt = options.find((o) => o.value === value)
-                                if (!opt) return null
+                        {selectedArray.length > 0 ? (
+                            mode === 'single' ? (
+                                // Single mode: show single value as text
+                                <span className="text-sm">
+                                    {options.find(o => o.value === selectedArray[0])?.label}
+                                </span>
+                            ) : (
+                                // Multi mode: show as badges
+                                selectedArray.map((value) => {
+                                    const opt = options.find((o) => o.value === value)
+                                    if (!opt) return null
 
-                                return (
-                                    <Badge
-                                        key={value}
-                                        variant="secondary"
-                                        className="mr-1 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleUnselect(value)
-                                        }}
-                                    >
-                                        {opt.label}
-                                        <X className="ml-1 h-3 w-3" />
-                                    </Badge>
-                                )
-                            })
+                                    return (
+                                        <Badge
+                                            key={value}
+                                            variant="secondary"
+                                            className="mr-1 cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleUnselect(value)
+                                            }}
+                                        >
+                                            {opt.label}
+                                            <X className="ml-1 h-3 w-3" />
+                                        </Badge>
+                                    )
+                                })
+                            )
                         ) : (
                             <span className="text-muted-foreground">{placeholder}</span>
                         )}
@@ -119,13 +150,13 @@ export default function MultiSelect({
                                 onClick={() => toggleSelect(opt.value)}
                                 className={cn(
                                     "flex items-center px-2 py-1 rounded-md cursor-pointer hover:bg-accent",
-                                    selected.includes(opt.value) && "bg-accent"
+                                    selectedArray.includes(opt.value) && "bg-accent"
                                 )}
                             >
                                 <Check
                                     className={cn(
                                         "mr-2 h-4 w-4",
-                                        selected.includes(opt.value)
+                                        selectedArray.includes(opt.value)
                                             ? "opacity-100"
                                             : "opacity-0"
                                     )}
