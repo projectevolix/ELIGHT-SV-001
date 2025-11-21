@@ -131,7 +131,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
             <FormItem>
               <FormLabel>Tournament Name</FormLabel>
               <FormControl>
-                <Input placeholder="Summer Championship 2024" {...field} disabled={isViewMode} />
+                <Input placeholder="Summer Championship 2024" {...field} disabled={isViewMode || isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,7 +144,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Grade</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode || isLoading}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a grade" />
@@ -170,7 +170,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
             <FormItem>
               <FormLabel>Venue</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. North America" {...field} disabled={isViewMode} />
+                <Input placeholder="e.g. North America" {...field} disabled={isViewMode || isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -185,7 +185,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
               <FormItem className="flex flex-col">
                 <FormLabel>Registration Starts</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild disabled={isViewMode}>
+                  <PopoverTrigger asChild disabled={isViewMode || isLoading}>
                     <FormControl>
                       <Button
                         variant={"outline"}
@@ -193,6 +193,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={isViewMode || isLoading}
                       >
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -204,7 +205,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => isViewMode || date < new Date("1900-01-01")}
+                      disabled={(date) => isViewMode || isLoading || date < new Date("1900-01-01")}
                       initialFocus
                     />
                   </PopoverContent>
@@ -220,7 +221,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
               <FormItem className="flex flex-col">
                 <FormLabel>Registration Ends</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild disabled={isViewMode}>
+                  <PopoverTrigger asChild disabled={isViewMode || isLoading}>
                     <FormControl>
                       <Button
                         variant={"outline"}
@@ -228,6 +229,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={isViewMode || isLoading}
                       >
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -239,7 +241,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => isViewMode || date < (form.getValues('registrationStartDate') || new Date("1900-01-01"))}
+                      disabled={(date) => isViewMode || isLoading || date < (form.getValues('registrationStartDate') || new Date("1900-01-01"))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -258,7 +260,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
               <FormItem className="flex flex-col">
                 <FormLabel>Start Date</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild disabled={isViewMode}>
+                  <PopoverTrigger asChild disabled={isViewMode || isLoading}>
                     <FormControl>
                       <Button
                         variant={"outline"}
@@ -266,6 +268,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={isViewMode || isLoading}
                       >
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -277,7 +280,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => isViewMode || date < (form.getValues('registrationEndDate') || new Date("1900-01-01"))}
+                      disabled={(date) => isViewMode || isLoading || date < (form.getValues('registrationEndDate') || new Date("1900-01-01"))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -294,7 +297,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
               <FormItem className="flex flex-col">
                 <FormLabel>End Date</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild disabled={isViewMode}>
+                  <PopoverTrigger asChild disabled={isViewMode || isLoading}>
                     <FormControl>
                       <Button
                         variant={"outline"}
@@ -302,6 +305,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={isViewMode || isLoading}
                       >
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -313,7 +317,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => isViewMode || date < (form.getValues('startDate') || new Date("1900-01-01"))}
+                      disabled={(date) => isViewMode || isLoading || date < (form.getValues('startDate') || new Date("1900-01-01"))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -351,7 +355,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode || isLoading}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />

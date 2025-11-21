@@ -1,67 +1,43 @@
 /**
- * Next.js Middleware for authentication
- * Handles protected routes, token validation, and redirects
- * Runs on every request before reaching route handlers
+ * Next.js Middleware Entry Point
+ *
+ * This file is required by Next.js at the root of src/
+ * It composes and exports middleware from modular middleware functions
+ *
+ * See: src/middleware/auth.ts for authentication middleware logic
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { authMiddleware } from "./middleware/auth";
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = ["/login", "/signup"];
-
-// Protected routes that require authentication
-const PROTECTED_ROUTES = [
-  "/associations",
-  "/tournaments",
-  "/draws",
-  "/player-rankings",
-  "/registration",
-];
-
+/**
+ * Main middleware handler
+ * Composes all middleware functions
+ *
+ * Order matters: auth runs first to ensure token validation
+ * before any other middleware checks
+ */
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Get token from cookies (secure, httpOnly) or localStorage fallback
-  const token = request.cookies.get("auth_token")?.value;
-
-  // Check if current path is public or protected
-  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(`/(root)${route}`)
-  );
-
-  // Redirect logic
-  if (isProtectedRoute && !token) {
-    // No token and trying to access protected route → redirect to login
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (isPublicRoute && token) {
-    // Has token and trying to access login/signup → redirect to dashboard
-    if (pathname === "/login" || pathname === "/signup") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
-  // Allow request to proceed
-  return NextResponse.next();
+  // Run authentication middleware
+  return authMiddleware(request);
 }
 
 /**
- * Configure middleware to run on specific paths
+ * Middleware matcher configuration
+ * Specifies which routes trigger middleware execution
  * Exclude static files, api routes, and _next internal routes
  */
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match all request paths except for:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder files
+     *
+     * This ensures middleware runs on all app routes but skips technical paths
      */
     "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
   ],

@@ -67,6 +67,7 @@ export function useSignup() {
 
 /**
  * Hook for user logout
+ * Clears token and session data
  */
 export function useLogout() {
   const { toast } = useToast();
@@ -79,6 +80,14 @@ export function useLogout() {
       toast({
         title: "Logged out",
         description: "You have been logged out successfully",
+      });
+      // Note: Redirect is handled by LogoutButton component after this succeeds
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Logout error",
+        description: error?.message || "An error occurred during logout",
+        variant: "destructive",
       });
     },
   });
