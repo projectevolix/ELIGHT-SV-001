@@ -23,10 +23,9 @@ const formSchema = z.object({
   }),
   ageCategory: z.string().min(1, 'Age category is required.'),
   gender: z.string().min(1, 'Gender is required.'),
-  weightClass: z.string().min(1, 'Weight class is required.'),
-  status: z.nativeEnum(EventStatus, { required_error: 'Status is required.' }),
+  weightClass: z.string().optional().or(z.literal('')),
   eventType: z.nativeEnum(EventType, { required_error: 'Event type is required.' }),
-  // teamSize: z.coerce.number().optional(),
+  teamSize: z.coerce.number().int().positive('Team size must be a positive number').optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -47,9 +46,7 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
       ageCategory: '',
       gender: '',
       weightClass: '',
-      status: EventStatus.DRAFT,
       eventType: EventType.INDIVIDUAL,
-      // teamSize: undefined,
     },
   });
 
@@ -62,9 +59,8 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         ageCategory: event.ageCategory || '',
         gender: event.gender?.toUpperCase() || '',
         weightClass: event.weightClass || '',
-        status: event.status,
         eventType: event.eventType,
-        // teamSize: undefined,
+        teamSize: event.teamSize || undefined,
       });
     } else {
       form.reset({
@@ -72,15 +68,17 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         ageCategory: '',
         gender: '',
         weightClass: '',
-        status: EventStatus.DRAFT,
         eventType: EventType.INDIVIDUAL,
-        // teamSize: undefined,
       });
     }
   }, [event, form]);
 
   function onSubmit(values: FormValues) {
-    onSave(values);
+    onSave({
+      ...values,
+      status: EventStatus.DRAFT,
+      teamSize: values.eventType === EventType.TEAM ? values.teamSize : null,
+    });
   }
 
   return (
@@ -155,19 +153,21 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="weightClass"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Weight Class</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. 50-60, 44KG" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {form.watch('discipline') === Discipline.KUMITE && (
+          <FormField
+            control={form.control}
+            name="weightClass"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Weight Class</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. 50-60, 44KG" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -198,14 +198,13 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
           />
         </div>
 
-        {/* Commented out - not in API model
-        {eventType === EventType.TEAM && (
+        {form.watch('eventType') === EventType.TEAM && (
           <FormField
             control={form.control}
             name="teamSize"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Number of Members</FormLabel>
+                <FormLabel>Team Size</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="e.g. 5" {...field} />
                 </FormControl>
@@ -214,38 +213,6 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
             )}
           />
         )}
-        */}
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => {
-            const statusOptions = [
-              { value: EventStatus.DRAFT, label: 'DRAFT' },
-              { value: EventStatus.PUBLISHED, label: 'PUBLISHED' },
-              { value: EventStatus.COMPLETED, label: 'COMPLETED' },
-              { value: EventStatus.LOCKED, label: 'LOCKED' },
-              { value: EventStatus.REG_CLOSED, label: 'REG_CLOSED' },
-              { value: EventStatus.CANCELLED, label: 'CANCELLED' },
-            ];
-            return (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <FormControl>
-                  <MultiSelect
-                    options={statusOptions}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    mode="single"
-                    placeholder="Select a status"
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>

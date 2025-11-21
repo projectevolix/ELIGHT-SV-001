@@ -7,6 +7,7 @@ import {
   fetchEventById,
   fetchEventsByTournament,
   fetchEventsByStatus,
+  fetchEventsByTournamentWithSelectedPlayers,
 } from "@/services/events.service";
 import { EventDTO, EventStatus } from "@/types/api/events";
 
@@ -44,6 +45,30 @@ export function useEventsByTournament(
   return useQuery<EventDTO[]>({
     queryKey: eventKeys.byTournamentList(tournamentId || 0, page, limit),
     queryFn: () => fetchEventsByTournament(tournamentId!, page, limit),
+    enabled:
+      tournamentId !== null && tournamentId !== undefined && tournamentId !== 0,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+/**
+ * Fetch events for a specific tournament with selected players count
+ */
+export function useEventsByTournamentWithSelectedPlayers(
+  tournamentId: number | null,
+  selectedPlayerCount: number = 1
+) {
+  return useQuery<EventDTO[]>({
+    queryKey: eventKeys.byTournamentList(
+      tournamentId || 0,
+      1,
+      selectedPlayerCount
+    ),
+    queryFn: () =>
+      fetchEventsByTournamentWithSelectedPlayers(
+        tournamentId!,
+        selectedPlayerCount
+      ),
     enabled:
       tournamentId !== null && tournamentId !== undefined && tournamentId !== 0,
     staleTime: 1000 * 60 * 5, // 5 minutes

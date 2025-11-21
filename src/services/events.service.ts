@@ -104,6 +104,21 @@ export async function updateEventStatus(
 }
 
 /**
+ * Fetch events for a specific tournament with selected players count
+ */
+export async function fetchEventsByTournamentWithSelectedPlayers(
+  tournamentId: number,
+  selectedPlayerCount: number = 1
+): Promise<EventDTO[]> {
+  const response = await apiClient.get<EventDTO[]>(
+    `${API_PATHS.EVENTS.BY_TOURNAMENT(
+      tournamentId
+    )}/selected-players?selectedPlayerCount=${selectedPlayerCount}`
+  );
+  return response;
+}
+
+/**
  * Delete event
  */
 export async function deleteEvent(id: number): Promise<void> {
