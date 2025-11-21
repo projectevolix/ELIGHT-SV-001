@@ -60,21 +60,23 @@ export async function signupUser(
 
 /**
  * Logout user (clear stored token and session)
- * Industrial-grade logout with token revocation and session cleanup
+ * Clears token from localStorage and cookies
+ * Backend doesn't have logout endpoint, so we just clear client-side storage
  */
 export async function logoutUser(client: ApiClient = apiClient): Promise<void> {
   try {
-    // Attempt to revoke token on backend (LOGOUT endpoint may not be available)
-    const logoutEndpoint = (API_PATHS.AUTH as any).LOGOUT || "/auth/logout";
-    await client.post<void>(logoutEndpoint, {});
-  } catch (error) {
-    // Continue logout even if API call fails
-    console.warn("Logout API call failed:", error);
-  } finally {
     // Clear legacy token storage
     client.clearAuthToken();
 
     // Clear secure session (httpOnly cookies + localStorage)
+    if (typeof window !== "undefined") {
+      const { clearAuthToken } = await import("@/lib/auth/client");
+      clearAuthToken();
+    }
+  } catch (error) {
+    // Log error but don't fail logout
+    console.error("Error during logout cleanup:", error);
+    // Still clear what we can
     if (typeof window !== "undefined") {
       const { clearAuthToken } = await import("@/lib/auth/client");
       clearAuthToken();
