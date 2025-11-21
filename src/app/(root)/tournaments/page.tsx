@@ -14,6 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TournamentSheet } from '@/components/tournaments/tournament-sheet';
 import { ManageEventsSheet } from '@/components/tournaments/manage-events-sheet';
+import { RegistrationSheet } from '@/components/registration/registration-sheet';
 import { TournamentCardGridSkeleton, TournamentRowListSkeleton } from '@/components/tournaments/tournament-skeleton';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -42,6 +43,7 @@ function TournamentsContent() {
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [manageEventsSheetOpen, setManageEventsSheetOpen] = useState(false);
+  const [registrationSheetOpen, setRegistrationSheetOpen] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
@@ -130,6 +132,11 @@ function TournamentsContent() {
     setManageEventsSheetOpen(true);
   };
 
+  const handleRegisterPlayers = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
+    setRegistrationSheetOpen(true);
+  };
+
   const handleDeleteClick = (tournament: Tournament) => {
     setTournamentToDelete(tournament);
     setDeleteAlertOpen(true);
@@ -186,6 +193,15 @@ function TournamentsContent() {
         }
       );
     }
+  };
+
+  const handleRegistrationSave = (data: any) => {
+    // Handle registration save - the registration form will handle the API call
+    setRegistrationSheetOpen(false);
+    toast({
+      title: "Success",
+      description: "Player registered successfully",
+    });
   };
 
   const getStatusVariant = (status: string) => {
@@ -334,7 +350,7 @@ function TournamentsContent() {
             <TableHeader>
               <TableRow>
                 <TableHead>Tournament</TableHead>
-                <TableHead>Grade</TableHead>
+                <TableHead>Register</TableHead>
                 <TableHead>Venue</TableHead>
                 <TableHead>Admin</TableHead>
                 <TableHead>Start Date</TableHead>
@@ -347,7 +363,15 @@ function TournamentsContent() {
               {filteredTournaments.map((tournament) => (
                 <TableRow key={tournament.id} onClick={() => handleView(tournament)} className="cursor-pointer">
                   <TableCell className="font-medium font-headline">{tournament.name}</TableCell>
-                  <TableCell>{tournament.grade}</TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleRegisterPlayers(tournament)}
+                    >
+                      Register
+                    </Button>
+                  </TableCell>
                   <TableCell>{tournament.venue}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{tournament.adminName}</TableCell>
                   <TableCell>{format(tournament.startDate, 'MMM d, yyyy')}</TableCell>
@@ -426,6 +450,12 @@ function TournamentsContent() {
         open={manageEventsSheetOpen}
         onOpenChange={setManageEventsSheetOpen}
         tournament={selectedTournament}
+      />
+      <RegistrationSheet
+        open={registrationSheetOpen}
+        onOpenChange={setRegistrationSheetOpen}
+        onSave={handleRegistrationSave}
+        preSelectedTournament={selectedTournament}
       />
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent>

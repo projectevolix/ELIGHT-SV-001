@@ -31,13 +31,14 @@ type RegistrationFormProps = {
   onSave: (data: any) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  preSelectedTournamentId?: string;
 };
 
-export function RegistrationForm({ onSave, onCancel, isLoading = false }: RegistrationFormProps) {
+export function RegistrationForm({ onSave, onCancel, isLoading = false, preSelectedTournamentId }: RegistrationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      tournamentId: '',
+      tournamentId: preSelectedTournamentId || '',
       playerId: '',
       eventId: '',
     },
