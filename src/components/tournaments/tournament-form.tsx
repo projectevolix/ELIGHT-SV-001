@@ -34,7 +34,6 @@ const formSchema = z.object({
   endDate: z.date({ required_error: 'An end date is required.' }),
   registrationStartDate: z.date({ required_error: 'A registration start date is required.' }),
   registrationEndDate: z.date({ required_error: 'A registration end date is required.' }),
-  status: z.nativeEnum(TournamentStatusEnum),
   adminId: z.string().min(1, 'Please select an admin.'),
   bannerUrl: z.string().url().optional().or(z.literal('')).nullable(),
 }).refine(data => data.endDate >= data.startDate, {
@@ -70,7 +69,6 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
       endDate: tournament?.endDate || new Date(),
       registrationStartDate: tournament?.registrationStartDate || new Date(),
       registrationEndDate: tournament?.registrationEndDate || new Date(),
-      status: tournament?.status || TournamentStatusEnum.SCHEDULED,
       adminId: tournament?.adminId ? tournament.adminId.toString() : '',
       bannerUrl: tournament?.bannerUrl || '',
     },
@@ -86,7 +84,6 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
         endDate: tournament.endDate,
         registrationStartDate: tournament.registrationStartDate,
         registrationEndDate: tournament.registrationEndDate,
-        status: tournament.status,
         adminId: tournament.adminId ? tournament.adminId.toString() : '',
         bannerUrl: tournament.bannerUrl,
       });
@@ -98,6 +95,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
     onSave({
       ...values,
       adminId: parseInt(values.adminId, 10),
+      status: TournamentStatusEnum.SCHEDULED,
       id: tournament?.id,
     });
   }
@@ -364,35 +362,6 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
               <FormMessage />
             </FormItem>
           )}
-        />
-
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => {
-            const statusOptions = [
-              { value: TournamentStatusEnum.SCHEDULED, label: 'Scheduled' },
-              { value: TournamentStatusEnum.ONGOING, label: 'Ongoing' },
-              { value: TournamentStatusEnum.FINISHED, label: 'Finished' },
-            ];
-            return (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <FormControl>
-                  <MultiSelect
-                    options={statusOptions}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    mode="single"
-                    placeholder="Select status"
-                    disabled={isViewMode || isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
         />
 
 

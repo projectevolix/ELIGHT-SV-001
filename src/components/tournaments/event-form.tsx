@@ -26,7 +26,6 @@ const formSchema = z.object({
   weightClass: z.string().min(1, 'Weight class is required.'),
   status: z.nativeEnum(EventStatus, { required_error: 'Status is required.' }),
   eventType: z.nativeEnum(EventType, { required_error: 'Event type is required.' }),
-  rounds: z.coerce.number().min(0, 'Rounds must be 0 or greater.'),
   // teamSize: z.coerce.number().optional(),
 });
 
@@ -50,7 +49,6 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
       weightClass: '',
       status: EventStatus.DRAFT,
       eventType: EventType.INDIVIDUAL,
-      rounds: 0,
       // teamSize: undefined,
     },
   });
@@ -66,7 +64,6 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         weightClass: event.weightClass || '',
         status: event.status,
         eventType: event.eventType,
-        rounds: event.rounds || 0,
         // teamSize: undefined,
       });
     } else {
@@ -77,7 +74,6 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         weightClass: '',
         status: EventStatus.DRAFT,
         eventType: EventType.INDIVIDUAL,
-        rounds: 0,
         // teamSize: undefined,
       });
     }
@@ -199,19 +195,6 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
                 </FormItem>
               );
             }}
-          />
-          <FormField
-            control={form.control}
-            name="rounds"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rounds</FormLabel>
-                <FormControl>
-                  <Input type="number" min="0" placeholder="0" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
           />
         </div>
 
