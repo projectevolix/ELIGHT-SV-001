@@ -26,7 +26,7 @@ import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { PlayerSheet } from './player-sheet';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { PlayerDetailsDialog } from './player-details-dialog';
+import { PlayerDetails } from './player-details';
 import { usePlayers, usePlayersByAssociation } from '@/hooks/api/usePlayerQueries';
 import { useCreatePlayer, useUpdatePlayer, useDeletePlayer } from '@/hooks/api/usePlayerMutations';
 import type { PlayerDTO } from '@/types/api/players';
@@ -270,7 +270,7 @@ export function ManagePlayersSheet({ open, onOpenChange, association }: ManagePl
         onSave={handleSavePlayer}
         association={association}
       />
-      <PlayerDetailsDialog
+      <PlayerDetails
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         player={selectedPlayer}
