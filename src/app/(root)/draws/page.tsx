@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Bracket } from '@/components/draws/bracket';
 import { FilterBar } from '@/components/draws/filter-bar';
-import { Scoreboard } from '@/components/draws/scoreboard';
+import { KumiteScoreboard } from '@/components/draws/scoreboard-kumite';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import type { Tournament, Event } from '@/components/draws/types';
@@ -27,12 +27,7 @@ const eventsData: Event[] = [
 export default function DrawsPage() {
   const [selectedTournamentId, setSelectedTournamentId] = useState<number | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
-  const [showScoreboard, setShowScoreboard] = useState(false);
-  const [akaScore, setAkaScore] = useState(1);
-  const [aoScore, setAoScore] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(180);
-  const [isRunning, setIsRunning] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState('3.00');
+  const [showKumiteScoreboard, setShowKumiteScoreboard] = useState(false);
 
   // Fetch real tournaments
   const { data: tournamentsApiData } = useTournaments(1, 100);
@@ -67,44 +62,6 @@ export default function DrawsPage() {
     return found || null;
   }, [selectedEventId, events]);
 
-  const handleAkaScore = (action: 'add' | 'subtract', value: number) => {
-    setAkaScore(prev => action === 'add' ? prev + value : Math.max(0, prev - value));
-  };
-
-  const handleAoScore = (action: 'add' | 'subtract', value: number) => {
-    setAoScore(prev => action === 'add' ? prev + value : Math.max(0, prev - value));
-  };
-
-  const handleTimerToggle = () => {
-    setIsRunning(!isRunning);
-  };
-
-  const handleTimerReset = () => {
-    const durationMap: Record<string, number> = {
-      '0.30': 30,
-      '1.00': 60,
-      '1.30': 90,
-      '2.00': 120,
-      '2.30': 150,
-      '3.00': 180,
-    };
-    setTimeRemaining(durationMap[selectedDuration] || 180);
-    setIsRunning(false);
-  };
-
-  const handleDurationChange = (duration: string) => {
-    setSelectedDuration(duration);
-    const durationMap: Record<string, number> = {
-      '0.30': 30,
-      '1.00': 60,
-      '1.30': 90,
-      '2.00': 120,
-      '2.30': 150,
-      '3.00': 180,
-    };
-    setTimeRemaining(durationMap[duration] || 180);
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -114,10 +71,10 @@ export default function DrawsPage() {
           </h1>
           {selectedTournamentId && selectedEventId && (
             <Button
-              onClick={() => setShowScoreboard(true)}
+              onClick={() => setShowKumiteScoreboard(true)}
               size="default"
             >
-              Scoreboard
+              Kumite Scoreboard
             </Button>
           )}
         </div>
@@ -138,10 +95,10 @@ export default function DrawsPage() {
           />
         )}
 
-        <Dialog open={showScoreboard} onOpenChange={setShowScoreboard}>
+        <Dialog open={showKumiteScoreboard} onOpenChange={setShowKumiteScoreboard}>
           <DialogContent className="max-w-7xl w-11/12 h-screen max-h-screen p-0 border-0">
             <button
-              onClick={() => setShowScoreboard(false)}
+              onClick={() => setShowKumiteScoreboard(false)}
               className="absolute right-4 top-4 z-10 rounded-md bg-gray-800 p-2 hover:bg-gray-700 transition-colors"
             >
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,26 +106,8 @@ export default function DrawsPage() {
               </svg>
             </button>
             {selectedTournamentId && selectedEventId && (
-              <Scoreboard
-                eventName={`${selectedEvent?.name || 'Kumite Match'}`}
-                akaPlayer={{
-                  name: 'Player 01',
-                  organization: 'Kenshin Kai',
-                  score: akaScore,
-                }}
-                aoPlayer={{
-                  name: 'Player 02',
-                  organization: 'Kenshin Kai',
-                  score: aoScore,
-                }}
-                timeRemaining={timeRemaining}
-                isRunning={isRunning}
-                onTimerToggle={handleTimerToggle}
-                onTimerReset={handleTimerReset}
-                onAkaScore={handleAkaScore}
-                onAoScore={handleAoScore}
-                selectedDuration={selectedDuration}
-                onDurationChange={handleDurationChange}
+              <KumiteScoreboard
+                eventName={selectedEvent?.name || 'Kumite Event'}
               />
             )}
           </DialogContent>
