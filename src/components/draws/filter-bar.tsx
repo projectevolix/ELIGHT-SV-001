@@ -9,9 +9,9 @@ import type { Tournament, Event } from './types';
 type FilterBarProps = {
   tournaments: Tournament[];
   events: Event[];
-  onTournamentChange: (id: string | null) => void;
-  onEventChange: (id: string | null) => void;
-  selectedTournamentId: string | null;
+  onTournamentChange: (id: number | null) => void;
+  onEventChange: (id: number | null) => void;
+  selectedTournamentId: number | null;
   eventsLoading?: boolean;
 };
 
@@ -28,18 +28,18 @@ export function FilterBar({ tournaments, events, onTournamentChange, onEventChan
         <div className="flex items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium">Tournament</label>
-            <Select onValueChange={(val) => { onTournamentChange(val); onEventChange(null); }}>
+            <Select onValueChange={(val) => { onTournamentChange(val ? Number(val) : null); onEventChange(null); }}>
               <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder="Select a tournament" />
               </SelectTrigger>
               <SelectContent>
-                {tournaments.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                {tournaments.map(t => <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium">Event</label>
-            <Select onValueChange={onEventChange} disabled={!selectedTournamentId || availableEvents.length === 0 || eventsLoading}>
+            <Select onValueChange={(val) => onEventChange(val ? Number(val) : null)} disabled={!selectedTournamentId || availableEvents.length === 0 || eventsLoading}>
               <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder={eventsLoading ? "Loading events..." : availableEvents.length === 0 && selectedTournamentId ? "No events" : "Select an event"} />
               </SelectTrigger>
@@ -49,7 +49,7 @@ export function FilterBar({ tournaments, events, onTournamentChange, onEventChan
                 ) : availableEvents.length === 0 && selectedTournamentId ? (
                   <div className="px-2 py-1.5 text-sm text-muted-foreground">No events available</div>
                 ) : (
-                  availableEvents.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                  availableEvents.map(e => <SelectItem key={e.id} value={String(e.id)}>{e.name}</SelectItem>)
                 )}
               </SelectContent>
             </Select>

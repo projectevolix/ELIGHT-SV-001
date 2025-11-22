@@ -46,7 +46,7 @@ import {
   useDeleteEvent,
   useUpdateEventStatus,
 } from '@/hooks/api/useEventMutations';
-import { EventDTO, EventStatus } from '@/types/api/events';
+import { EventDTO, EventStatus, EventType, Discipline } from '@/types/api/events';
 import type { Tournament } from '@/types/api/tournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -54,13 +54,12 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
-  discipline: z.string(),
+  discipline: z.enum([Discipline.KATA, Discipline.KUMITE]),
   ageCategory: z.string(),
   gender: z.string(),
-  weightClass: z.string(),
-  status: z.string(),
-  eventType: z.string(),
-  rounds: z.number(),
+  weightClass: z.string().optional().or(z.literal('')),
+  eventType: z.nativeEnum(EventType),
+  teamSize: z.coerce.number().int().positive().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -189,17 +188,16 @@ export function ManageEventsSheet({
       discipline: data.discipline,
       ageCategory: data.ageCategory,
       gender: data.gender,
-      eventType: data.eventType as any,
-      status: data.status as any,
+      eventType: data.eventType,
     } as any;
 
     // For KUMITE, always include weightClass
-    if (data.discipline === 'KUMITE') {
+    if (data.discipline === Discipline.KUMITE && data.weightClass) {
       payload.weightClass = data.weightClass;
     }
 
     // For TEAM events, always include teamSize
-    if (data.eventType === 'TEAM') {
+    if (data.eventType === EventType.TEAM && data.teamSize) {
       payload.teamSize = data.teamSize;
     }
 
