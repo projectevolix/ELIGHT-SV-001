@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useTournaments } from "@/hooks/api/useTournaments";
 import { useEventsByTournament } from "@/hooks/api/useEvents";
 import { useDrawByTournamentAndEvent } from "@/hooks/api/useDraws";
+import { useCurrentUser } from "@/hooks/api/useUsers";
 import { TournamentData } from "@/utils/tournamentLayout";
 
 export function useDrawsData() {
@@ -9,6 +10,9 @@ export function useDrawsData() {
     string | null
   >(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+
+  // Fetch current user
+  const { data: user } = useCurrentUser();
 
   // Fetch real tournaments
   const { data: tournamentsApiData, isLoading: tournamentsLoading } =
@@ -95,5 +99,6 @@ export function useDrawsData() {
     tournamentsLoading,
     eventsLoading,
     drawLoading,
+    user,
   };
 }

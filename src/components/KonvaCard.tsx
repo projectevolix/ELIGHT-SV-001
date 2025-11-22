@@ -101,8 +101,6 @@ export const KonvaCard: FC<KonvaCardProps> = ({
     }
   };
 
-
-
   const cardStrokeWidth = isCardHovered || isHighlighted ? 3 : 3;
   const cardStroke = getStatusBorderColor();
   const cardBackground = getStatusBackgroundColor();
@@ -159,8 +157,6 @@ export const KonvaCard: FC<KonvaCardProps> = ({
       onMouseLeave={handleCardMouseLeave}
     // draggable
     >
-
-
       {/* Seed Text */}
       <Text
         x={textPaddingX}
@@ -233,6 +229,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
 
       {/* Player 1 Background */}
       <Rect
+        name="player-bg"
         x={1.5}
         y={headerHeight + 1}
         width={playerBackgroundWidth}
@@ -244,7 +241,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
       <Text
         x={textPaddingX}
         y={playerText1Y}
-        text={truncateText(player1, 15) + (winner === player1 ? " 👑" : "")}
+        text={truncateText(player1 || "", 15) + (winner === player1 ? " 👑" : "")}
         fontSize={playerFontSize}
         fontFamily="Arial, sans-serif"
         fontStyle=""
@@ -255,6 +252,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
 
       {/* AKA Label */}
       <Text
+        name="player-label"
         x={playerBackgroundWidth - 40}
         y={playerText1Y}
         text="AKA"
@@ -280,6 +278,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
         <>
           {/* Player 2 Background */}
           <Rect
+            name="player-bg"
             x={1.5}
             y={headerHeight + 30}
             width={playerBackgroundWidth}
@@ -300,6 +299,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
 
           {/* AO Label */}
           <Text
+            name="player-label"
             x={playerBackgroundWidth - 40}
             y={playerText2Y}
             text="AO"
@@ -317,6 +317,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
       {
         !isBye && (
           <Group
+            name="view-button"
             x={buttonX}
             y={buttonY}
             onMouseEnter={handleButtonMouseEnter}
@@ -355,8 +356,6 @@ export const KonvaCard: FC<KonvaCardProps> = ({
               align="center"
               verticalAlign="middle"
             />
-            {/* Card Background */}
-
           </Group>
         )
       }

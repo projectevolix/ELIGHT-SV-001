@@ -18,6 +18,7 @@ export default function DrawsPage() {
     tournamentLayoutData,
     eventsLoading,
     drawLoading,
+    user,
   } = useDrawsData();
 
   return (
@@ -56,6 +57,7 @@ export default function DrawsPage() {
               tournamentLayoutData={tournamentLayoutData}
               tournamentName={selectedTournament?.name || "Tournament"}
               eventName={selectedEvent?.name || "Event"}
+              userName={user?.name || "Unknown User"}
             />
           </div>
         )}
