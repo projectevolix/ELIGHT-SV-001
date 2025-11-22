@@ -46,7 +46,8 @@ export interface EventDTO {
   discipline: string; // KATA or KUMITE
   ageCategory: string; // U15, 12-15, etc - free text
   gender: string; // Male, Female, MALE, FEMALE - normalized to uppercase
-  weightClass: string; // 50-60, 44KG, etc - free text
+  weightClass: string; // 50-60, 44KG, etc - free text (only for KUMITE)
+  teamSize?: number; // Only for TEAM events
   eventType: EventType;
   rounds: number; // 0+
   status: EventStatus;

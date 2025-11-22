@@ -49,6 +49,9 @@ const getStatusVariant = (status: string) => {
 export function EventDetails({ event }: EventDetailsProps) {
     if (!event) return null;
 
+    const shouldShowWeightClass = event.discipline === 'KUMITE' && event.weightClass;
+    const shouldShowTeamSize = event.eventType === 'TEAM' && event.teamSize;
+
     return (
         <div className="space-y-6">
             <div className="space-y-1">
@@ -60,9 +63,13 @@ export function EventDetails({ event }: EventDetailsProps) {
                 <DetailItem icon={Zap} label="Discipline" value={event.discipline} />
                 <DetailItem icon={Award} label="Age Category" value={event.ageCategory} />
                 <DetailItem icon={Users} label="Gender" value={event.gender} />
-                <DetailItem icon={Dumbbell} label="Weight Class" value={event.weightClass} />
+                {shouldShowWeightClass && (
+                    <DetailItem icon={Dumbbell} label="Weight Class" value={event.weightClass} />
+                )}
+                {shouldShowTeamSize && (
+                    <DetailItem icon={Users} label="Team Size" value={event.teamSize} />
+                )}
                 <DetailItem icon={ListChecks} label="Event Type" value={event.eventType} />
-                <DetailItem icon={Calendar} label="Rounds" value={event.rounds} />
                 <DetailItem
                     icon={Badge}
                     label="Status"
