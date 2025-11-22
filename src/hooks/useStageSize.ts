@@ -1,6 +1,8 @@
-import { useState, useEffect, type RefObject } from 'react';
+import { useState, useEffect, type RefObject } from "react";
 
-export const useStageSize = (containerRef: RefObject<HTMLDivElement | null>) => {
+export const useStageSize = (
+  containerRef: RefObject<HTMLDivElement | null>
+) => {
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
 
   useEffect(() => {
@@ -14,8 +16,8 @@ export const useStageSize = (containerRef: RefObject<HTMLDivElement | null>) => 
     };
 
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, [containerRef]);
 
   return stageSize;

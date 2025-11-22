@@ -355,7 +355,7 @@ export const drawKeys = {
     ] as const,
 } as const;
 
-export function getDrawInvalidationKeys(
+export function getDrawinvalidationKeys(
   tournamentId?: number,
   eventId?: number
 ) {

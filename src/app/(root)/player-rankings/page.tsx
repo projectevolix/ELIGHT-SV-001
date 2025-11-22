@@ -225,7 +225,7 @@ export default function PlayerRankingsPage() {
               <TableHead>Age</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead>Events</TableHead>
-              <TableHead>Wins</TableHead>
+              <TableHead>wins</TableHead>
               <TableHead>
                 <Button variant="ghost" onClick={() => requestSort('points')} className="px-0 h-auto hover:bg-transparent">
                   Points

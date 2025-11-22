@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { drawKeys, getDrawInvalidationKeys } from "@/lib/query-keys";
+import { drawKeys, getDrawinvalidationKeys } from "@/lib/query-keys";
 import {
   fetchDrawByTournamentAndEvent,
   publishDraw,

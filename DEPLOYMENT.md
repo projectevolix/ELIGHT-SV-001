@@ -277,7 +277,7 @@ docker ps -a  # Look for status
 docker run -p 8000:3000 elight-frontend:latest
 
 # Kill existing process on port 3000
-# Windows: netstat -ano | findstr :3000
+# windows: netstat -ano | findstr :3000
 # Linux: lsof -i :3000
 ```
 

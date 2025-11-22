@@ -49,7 +49,7 @@ export function createQueryClient(): QueryClient {
                 // Disable automatic refetch on mount if data is fresh
                 refetchOnMount: false,
                 // Disable automatic refetch when window regains focus
-                refetchOnWindowFocus: false,
+                refetchOnwindowFocus: false,
                 // Disable automatic refetch when reconnecting
                 refetchOnReconnect: false,
             },

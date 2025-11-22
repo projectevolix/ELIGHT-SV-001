@@ -51,7 +51,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
 
   // Card dimensions and layout
   const cardWidth = 300;
-  const cardHeight = isBye ? 70 : 100; // Reduced height for Bye cards
+  const cardHeight = isBye ? 62 : 90; // Reduced height for Bye cards
   const cornerRadius = 5;
   const padding = 10;
   const textPaddingX = 12;
@@ -71,7 +71,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
   const buttonHeight = 45;
   const buttonWidth = (cardWidth - padding * 2) / 4;
   const buttonX = cardWidth - buttonWidth - padding;
-  const buttonY = playerText1Y;
+  const buttonY = 37;
   const buttonCornerRadius = 5;
 
   // Dynamic properties based on status and hover state
@@ -159,17 +159,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
       onMouseLeave={handleCardMouseLeave}
     // draggable
     >
-      {/* Card Background */}
-      <Rect
-        width={cardWidth}
-        height={cardHeight}
-        fill={cardBackground}
-        stroke={cardStroke}
-        strokeWidth={cardStrokeWidth}
-        cornerRadius={cornerRadius}
-        shadowBlur={cardShadowBlur}
-        shadowColor={isHighlighted ? colors.primary : "transparent"}
-      />
+
 
       {/* Seed Text */}
       <Text
@@ -365,9 +355,20 @@ export const KonvaCard: FC<KonvaCardProps> = ({
               align="center"
               verticalAlign="middle"
             />
+            {/* Card Background */}
+
           </Group>
         )
       }
+      <Rect
+        width={cardWidth}
+        height={cardHeight}
+        stroke={cardStroke}
+        strokeWidth={cardStrokeWidth}
+        cornerRadius={cornerRadius}
+        shadowBlur={cardShadowBlur}
+        shadowColor={isHighlighted ? colors.primary : "transparent"}
+      />
     </Group >
   );
 };

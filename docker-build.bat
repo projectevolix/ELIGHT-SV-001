@@ -1,5 +1,5 @@
 @echo off
-REM ELIGHT-SV-001 Frontend Docker Build Script for Windows
+REM ELIGHT-SV-001 Frontend Docker Build Script for windows
 REM Usage: docker-build.bat [tag] [registry]
 REM Example: docker-build.bat latest myregistry.azurecr.io
 

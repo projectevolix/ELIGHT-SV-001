@@ -58,8 +58,6 @@ import type { TournamentData } from "./tournamentLayout";
 //   ],
 // };
 
-
-
 export const sampleTournamentData: TournamentData = {
   "Round-01": [
     {
@@ -92,7 +90,7 @@ export const sampleTournamentData: TournamentData = {
       winner: "Amal",
       status: "finished",
     },
-     {
+    {
       seed: "BYE",
       player1: "Tharindu",
       isBye: true,

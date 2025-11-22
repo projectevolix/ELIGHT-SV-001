@@ -42,6 +42,7 @@ body {
     --sidebar-border: 225 50% 35%;
     --sidebar-ring: 32 79% 52%;
   }
+
   .dark {
     --background: 225 15% 12%;
     --foreground: 210 40% 98%;
@@ -82,6 +83,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
