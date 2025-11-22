@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useCallback } from 'react';
 import { Stage, Layer, Line, Text } from 'react-konva';
 import { KonvaCard } from '@/components/KonvaCard';
 import { ZoomControls } from '@/components/ZoomControls';
@@ -8,14 +8,18 @@ import { useStageControls } from '@/hooks/useStageControls';
 import { usePathHighlighting } from '@/utils/pathHighlighting';
 import { useKonvaColors } from '@/hooks/useKonvaColors';
 import { calculateConnectingLines, calculateTreePositions, defaultLayoutConfig, TournamentData } from '@/utils/tournamentLayout';
+import jsPDF from 'jspdf';
 
 interface DrawCanvasProps {
     tournamentLayoutData: TournamentData;
+    tournamentName: string;
+    eventName: string;
 }
 
-export function DrawCanvas({ tournamentLayoutData }: DrawCanvasProps) {
+export function DrawCanvas({ tournamentLayoutData, tournamentName, eventName }: DrawCanvasProps) {
     const colors = useKonvaColors();
     const containerRef = useRef<HTMLDivElement>(null);
+    const stageRef = useRef<any>(null);
 
     // Custom hooks for stage management
     const stageSize = useStageSize(containerRef);
@@ -97,6 +101,87 @@ export function DrawCanvas({ tournamentLayoutData }: DrawCanvasProps) {
         console.log("Tournament Match Data:", matchData);
     };
 
+    const handleExport = useCallback(() => {
+        if (!stageRef.current) return;
+
+        const stage = stageRef.current;
+
+        // Save current state
+        const oldScale = stage.scaleX();
+        const oldPos = stage.position();
+
+        // Calculate total size of the tree to fit in PDF
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        tree.forEach(node => {
+            minX = Math.min(minX, node.x);
+            maxX = Math.max(maxX, node.x + defaultLayoutConfig.cardWidth);
+            minY = Math.min(minY, node.y);
+            maxY = Math.max(maxY, node.y + defaultLayoutConfig.cardHeight);
+        });
+
+        const padding = 50;
+        const treeWidth = maxX - minX + padding * 2;
+        const treeHeight = maxY - minY + padding * 2;
+
+        // Set scale to 1 and position to include everything for capture
+        stage.scale({ x: 1, y: 1 });
+        stage.position({ x: -minX + padding, y: -minY + padding });
+
+        const dataUrl = stage.toDataURL({
+            pixelRatio: 2, // Higher quality
+            x: -minX,
+            y: -minY,
+            width: treeWidth,
+            height: treeHeight
+        });
+
+        // Restore state
+        stage.scale({ x: oldScale, y: oldScale });
+        stage.position(oldPos);
+
+        // Create PDF
+        // A4 landscape: 297mm x 210mm
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        // Add Header
+        pdf.setFontSize(18);
+        pdf.text(tournamentName, 14, 20);
+
+        pdf.setFontSize(14);
+        pdf.setTextColor(100);
+        pdf.text(eventName, 14, 30);
+
+        // Add Image
+        // Calculate aspect ratio to fit in page
+        const margin = 14;
+        const availableWidth = pageWidth - margin * 2;
+        const availableHeight = pageHeight - 40 - margin; // 40 for header
+
+        const imgRatio = treeWidth / treeHeight;
+        const pageRatio = availableWidth / availableHeight;
+
+        let imgWidth, imgHeight;
+
+        if (imgRatio > pageRatio) {
+            imgWidth = availableWidth;
+            imgHeight = availableWidth / imgRatio;
+        } else {
+            imgHeight = availableHeight;
+            imgWidth = availableHeight * imgRatio;
+        }
+
+        // Center image
+        const x = (pageWidth - imgWidth) / 2;
+        const y = 40 + (availableHeight - imgHeight) / 2;
+
+        pdf.addImage(dataUrl, 'PNG', x, y, imgWidth, imgHeight);
+
+        pdf.save(`${tournamentName.replace(/\s+/g, '_')}-${eventName.replace(/\s+/g, '_')}-draw.pdf`);
+
+    }, [tree, tournamentName, eventName]);
+
     return (
         <div
             ref={containerRef}
@@ -106,6 +191,7 @@ export function DrawCanvas({ tournamentLayoutData }: DrawCanvasProps) {
             }}
         >
             <Stage
+                ref={stageRef}
                 width={stageSize.width}
                 height={stageSize.height}
                 scaleX={stageScale}
@@ -187,6 +273,7 @@ export function DrawCanvas({ tournamentLayoutData }: DrawCanvasProps) {
                 onZoomIn={zoomIn}
                 onZoomOut={zoomOut}
                 onResetZoom={resetZoom}
+                onExport={handleExport}
             />
         </div>
     );

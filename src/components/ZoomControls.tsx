@@ -1,13 +1,14 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { Minus, Plus, RotateCcw, Download } from "lucide-react";
 
 interface ZoomControlsProps {
   stageScale: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
+  onExport?: () => void;
 }
 
 export const ZoomControls: React.FC<ZoomControlsProps> = ({
@@ -15,11 +16,25 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
   onZoomIn,
   onZoomOut,
   onResetZoom,
+  onExport,
 }) => {
   const zoomPercentage = Math.round(stageScale * 100);
 
   return (
     <div className="absolute bottom-4 right-4 flex flex-col gap-2 bg-background/90 backdrop-blur-sm p-2 rounded-lg border shadow-sm z-10">
+      {onExport && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onExport}
+          aria-label="Export diagram"
+          className="h-8 w-8 mb-1"
+          title="Export to PDF"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
+      )}
+
       <Button
         variant="outline"
         size="icon"
