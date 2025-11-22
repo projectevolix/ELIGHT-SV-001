@@ -359,7 +359,9 @@ export function getDrawInvalidationKeys(
   tournamentId?: number,
   eventId?: number
 ) {
-  const keys = [drawKeys.lists()];
+  const keys: (readonly string[] | readonly (string | number)[])[] = [
+    drawKeys.lists(),
+  ];
 
   if (tournamentId && eventId) {
     keys.push(

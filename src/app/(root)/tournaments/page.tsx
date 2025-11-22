@@ -14,6 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TournamentSheet } from '@/components/tournaments/tournament-sheet';
 import { ManageEventsSheet } from '@/components/tournaments/manage-events-sheet';
+import { ManageTatamisSheet } from '@/components/tournaments/manage-tatamis-sheet';
 import { RegistrationSheet } from '@/components/registration/registration-sheet';
 import { TournamentCardGridSkeleton, TournamentRowListSkeleton } from '@/components/tournaments/tournament-skeleton';
 import Image from 'next/image';
@@ -43,6 +44,7 @@ function TournamentsContent() {
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [manageEventsSheetOpen, setManageEventsSheetOpen] = useState(false);
+  const [manageTatamisSheetOpen, setManageTatamisSheetOpen] = useState(false);
   const [registrationSheetOpen, setRegistrationSheetOpen] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [sheetMode, setSheetMode] = useState<'view' | 'edit' | 'create'>('create');
@@ -130,6 +132,11 @@ function TournamentsContent() {
   const handleManageEvents = (tournament: Tournament) => {
     setSelectedTournament(tournament);
     setManageEventsSheetOpen(true);
+  };
+
+  const handleManageTatamis = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
+    setManageTatamisSheetOpen(true);
   };
 
   const handleRegisterPlayers = (tournament: Tournament) => {
@@ -333,6 +340,10 @@ function TournamentsContent() {
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Manage Events</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleManageTatamis(tournament)}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Manage Tatamis</span>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => handleDeleteClick(tournament)} className="text-destructive">
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -399,6 +410,10 @@ function TournamentsContent() {
                           <Settings className="mr-2 h-4 w-4" />
                           <span>Manage Events</span>
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleManageTatamis(tournament) }}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Manage Tatamis</span>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDeleteClick(tournament) }} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -449,6 +464,11 @@ function TournamentsContent() {
       <ManageEventsSheet
         open={manageEventsSheetOpen}
         onOpenChange={setManageEventsSheetOpen}
+        tournament={selectedTournament}
+      />
+      <ManageTatamisSheet
+        open={manageTatamisSheetOpen}
+        onOpenChange={setManageTatamisSheetOpen}
         tournament={selectedTournament}
       />
       <RegistrationSheet

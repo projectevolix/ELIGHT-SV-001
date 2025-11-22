@@ -8,20 +8,19 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
-import { EventDTO } from '@/types/api/events';
+import { EventDTO, EventStatus, EventType, Discipline } from '@/types/api/events';
 import { EventForm } from './event-form';
 import { EventDetails } from './event-details';
 import { X } from 'lucide-react';
 import { z } from 'zod';
 
 const formSchema = z.object({
-  discipline: z.string(),
+  discipline: z.enum([Discipline.KATA, Discipline.KUMITE]),
   ageCategory: z.string(),
   gender: z.string(),
-  weightClass: z.string(),
-  status: z.string(),
-  eventType: z.string(),
-  rounds: z.number(),
+  weightClass: z.string().optional().or(z.literal('')),
+  eventType: z.nativeEnum(EventType),
+  teamSize: z.coerce.number().int().positive().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
