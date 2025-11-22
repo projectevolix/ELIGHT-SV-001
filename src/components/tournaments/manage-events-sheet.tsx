@@ -189,11 +189,19 @@ export function ManageEventsSheet({
       discipline: data.discipline,
       ageCategory: data.ageCategory,
       gender: data.gender,
-      weightClass: data.weightClass,
-      status: data.status as any,
       eventType: data.eventType as any,
-      rounds: data.rounds,
-    };
+      status: data.status as any,
+    } as any;
+
+    // For KUMITE, always include weightClass
+    if (data.discipline === 'KUMITE') {
+      payload.weightClass = data.weightClass;
+    }
+
+    // For TEAM events, always include teamSize
+    if (data.eventType === 'TEAM') {
+      payload.teamSize = data.teamSize;
+    }
 
     if (eventSheetMode === 'create') {
       createMutation.mutate({

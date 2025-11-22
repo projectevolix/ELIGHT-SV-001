@@ -47,6 +47,7 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
       gender: '',
       weightClass: '',
       eventType: EventType.INDIVIDUAL,
+      teamSize: undefined,
     },
   });
 
@@ -69,16 +70,31 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
         gender: '',
         weightClass: '',
         eventType: EventType.INDIVIDUAL,
+        teamSize: undefined,
       });
     }
   }, [event, form]);
 
   function onSubmit(values: FormValues) {
-    onSave({
-      ...values,
+    const payload = {
+      discipline: values.discipline,
+      ageCategory: values.ageCategory,
+      gender: values.gender,
+      eventType: values.eventType,
       status: EventStatus.DRAFT,
-      teamSize: values.eventType === EventType.TEAM ? values.teamSize : null,
-    });
+    } as any;
+
+    // For KUMITE, always include weightClass
+    if (values.discipline === Discipline.KUMITE) {
+      payload.weightClass = values.weightClass || '';
+    }
+
+    // For TEAM events, always include teamSize
+    if (values.eventType === EventType.TEAM) {
+      payload.teamSize = values.teamSize || 0;
+    }
+
+    onSave(payload);
   }
 
   return (
@@ -206,7 +222,13 @@ export function EventForm({ mode, event, onSave, onCancel, isLoading = false }: 
               <FormItem>
                 <FormLabel>Team Size</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="e.g. 5" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="e.g. 5"
+                    {...field}
+                    value={field.value || ''}
+                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -339,3 +339,34 @@ export function getRegistrationInvalidationKeys(
 
   return keys;
 }
+
+export const drawKeys = {
+  all: ["draws"] as const,
+  lists: () => [...drawKeys.all, "list"] as const,
+  byTournamentAndEvent: (tournamentId: number, eventId: number) =>
+    [...drawKeys.all, "tournament", tournamentId, "event", eventId] as const,
+  byTournamentAndEventList: (tournamentId: number, eventId: number) =>
+    [
+      ...drawKeys.lists(),
+      "tournament",
+      tournamentId,
+      "event",
+      eventId,
+    ] as const,
+} as const;
+
+export function getDrawInvalidationKeys(
+  tournamentId?: number,
+  eventId?: number
+) {
+  const keys = [drawKeys.lists()];
+
+  if (tournamentId && eventId) {
+    keys.push(
+      drawKeys.byTournamentAndEvent(tournamentId, eventId),
+      drawKeys.byTournamentAndEventList(tournamentId, eventId)
+    );
+  }
+
+  return keys;
+}

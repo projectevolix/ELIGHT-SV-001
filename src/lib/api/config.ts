@@ -92,6 +92,13 @@ export const API_PATHS = {
       `/registrations/player/${playerId}`,
     BY_EVENT: (eventId: string | number) => `/registrations/event/${eventId}`,
   },
+  DRAWS: {
+    BY_TOURNAMENT_AND_EVENT: (
+      tournamentId: string | number,
+      eventId: string | number
+    ) => `/draws/tournament/${tournamentId}/event/${eventId}`,
+    PUBLISH: (drawId: string) => `/draws/${drawId}/publish`,
+  },
 } as const;
 
 /**

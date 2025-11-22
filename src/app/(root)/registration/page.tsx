@@ -136,7 +136,7 @@ export default function RegistrationPage() {
                             </Select>
                         </div>
                         <div className="ml-auto">
-                            <Button>public draw</Button>
+                            <Button>Publish draw</Button>
                         </div>
                     </div>
 
