@@ -172,7 +172,7 @@ export function TournamentForm({ mode, tournament, onSave, isLoading = false }: 
             <FormItem>
               <FormLabel>Venue</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. North America" {...field} disabled={isViewMode || isLoading} />
+                <Input placeholder="e.g. Sugathadasa Stadium" {...field} disabled={isViewMode || isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>

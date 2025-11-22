@@ -330,7 +330,15 @@ export function ManageEventsSheet({
                     </TableRow>
                   ) : (
                     paginatedEvents.map((event) => (
-                      <TableRow key={event.id}>
+                      <TableRow
+                        key={event.id}
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => {
+                          setSelectedEvent(event);
+                          setEventSheetMode('view');
+                          setEventSheetOpen(true);
+                        }}
+                      >
                         <TableCell className="font-medium">{event.discipline}</TableCell>
                         <TableCell>{event.ageCategory}</TableCell>
                         <TableCell>{event.gender}</TableCell>
@@ -341,7 +349,7 @@ export function ManageEventsSheet({
                             {event.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon">
