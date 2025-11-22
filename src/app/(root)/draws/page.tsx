@@ -1,11 +1,14 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Bracket } from '@/components/draws/bracket';
 import { FilterBar } from '@/components/draws/filter-bar';
 import type { Tournament, Event } from '@/components/draws/types';
+import { useTournaments } from '@/hooks/api/useTournaments';
+import { useEventsByTournament } from '@/hooks/api/useEvents';
+import { useDrawByTournamentAndEvent } from '@/hooks/api/useDraws';
 
 const tournamentsData: Tournament[] = [
   { id: '1', name: 'National Karate Championship 2025' },
@@ -22,14 +25,38 @@ export default function DrawsPage() {
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
+  // Fetch real tournaments
+  const { data: tournamentsApiData } = useTournaments(1, 100);
+  const tournaments = tournamentsApiData?.tournaments || tournamentsData;
+
+  // Fetch real events for selected tournament
+  const tournamentIdNum = selectedTournamentId ? parseInt(selectedTournamentId, 10) : null;
+  const { data: eventsApiData } = useEventsByTournament(tournamentIdNum, 1, 100);
+  const events = eventsApiData && eventsApiData.length > 0 ? eventsApiData.map((e, idx) => ({
+    id: e.id.toString(),
+    tournamentId: selectedTournamentId || '',
+    name: `${e.discipline} - ${e.ageCategory} - ${e.gender}${e.weightClass ? ` - ${e.weightClass}` : ''}`,
+  })) : eventsData;
+
+  // Fetch draw data
+  const eventIdNum = selectedEventId ? parseInt(selectedEventId, 10) : null;
+  const { data: drawData, isPending: drawLoading } = useDrawByTournamentAndEvent(tournamentIdNum, eventIdNum);
+
+  // Console.log draw data when it changes
+  useEffect(() => {
+    if (drawData) {
+      console.log('Draw Data:', drawData);
+    }
+  }, [drawData]);
+
   const selectedTournament = useMemo(() =>
-    tournamentsData.find(t => t.id === selectedTournamentId) || null,
-    [selectedTournamentId]
+    tournaments.find(t => t.id.toString() === selectedTournamentId) || null,
+    [selectedTournamentId, tournaments]
   );
 
   const selectedEvent = useMemo(() =>
-    eventsData.find(e => e.id === selectedEventId) || null,
-    [selectedEventId]
+    events.find(e => e.id === selectedEventId) || null,
+    [selectedEventId, events]
   );
 
   return (
@@ -39,14 +66,15 @@ export default function DrawsPage() {
           Draws
         </h1>
         <FilterBar
-          tournaments={tournamentsData}
-          events={eventsData}
+          tournaments={tournaments as any}
+          events={events as any}
           onTournamentChange={setSelectedTournamentId}
           onEventChange={setSelectedEventId}
           selectedTournamentId={selectedTournamentId}
+          eventsLoading={eventsApiData === undefined && selectedTournamentId !== null}
         />
 
-        {selectedTournament && selectedEvent && (
+        {selectedTournament && selectedEvent && drawData && (
           <Bracket
             tournament={selectedTournament}
             event={selectedEvent}

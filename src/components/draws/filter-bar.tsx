@@ -12,10 +12,11 @@ type FilterBarProps = {
   onTournamentChange: (id: string | null) => void;
   onEventChange: (id: string | null) => void;
   selectedTournamentId: string | null;
+  eventsLoading?: boolean;
 };
 
-export function FilterBar({ tournaments, events, onTournamentChange, onEventChange, selectedTournamentId }: FilterBarProps) {
-  
+export function FilterBar({ tournaments, events, onTournamentChange, onEventChange, selectedTournamentId, eventsLoading = false }: FilterBarProps) {
+
   const availableEvents = useMemo(() => {
     if (!selectedTournamentId) return [];
     return events.filter(e => e.tournamentId === selectedTournamentId);
@@ -38,12 +39,18 @@ export function FilterBar({ tournaments, events, onTournamentChange, onEventChan
           </div>
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium">Event</label>
-            <Select onValueChange={onEventChange} disabled={!selectedTournamentId || availableEvents.length === 0}>
+            <Select onValueChange={onEventChange} disabled={!selectedTournamentId || availableEvents.length === 0 || eventsLoading}>
               <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select an event" />
+                <SelectValue placeholder={eventsLoading ? "Loading events..." : availableEvents.length === 0 && selectedTournamentId ? "No events" : "Select an event"} />
               </SelectTrigger>
               <SelectContent>
-                 {availableEvents.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                {eventsLoading ? (
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">Loading events...</div>
+                ) : availableEvents.length === 0 && selectedTournamentId ? (
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">No events available</div>
+                ) : (
+                  availableEvents.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                )}
               </SelectContent>
             </Select>
           </div>
