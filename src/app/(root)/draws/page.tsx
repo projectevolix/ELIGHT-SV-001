@@ -1,9 +1,9 @@
 'use client';
 
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
-import { FilterBar } from '@/components/draws/filter-bar';
 import { useDrawsData } from '../../../hooks/useDrawsData';
 import { DrawCanvas } from '../../../components/DrawCanvas';
+import { FilterBar } from '@/components/draws/filter-bar';
 
 export default function DrawsPage() {
   const {

@@ -1,22 +1,23 @@
+
 export type Tournament = {
-  id: number;
+  id: string;
   name: string;
 };
 
 export type Event = {
-  id: number;
-  tournamentId: number;
+  id: string;
+  tournamentId: string;
   name: string;
 };
 
 export type Match = {
-  id: number;
-  seeds: string;
-  player1: string;
-  player2: string;
+    id: number;
+    seeds: string;
+    player1: string;
+    player2: string;
 };
 
 export type Round = {
-  name: string;
-  matches: Match[];
+    name: string;
+    matches: Match[];
 };
