@@ -44,7 +44,7 @@ export const useStageZoom = () => {
 
   const resetZoom = useCallback(() => {
     setStageScale(1);
-    setStagePosition({ x: 0, y: 0 });
+    setStagePosition({ x: 0, y: 50 });
   }, []);
 
   const fitToScreen = useCallback(

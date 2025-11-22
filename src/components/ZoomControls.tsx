@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, RotateCcw } from "lucide-react";
 
 interface ZoomControlsProps {
   stageScale: number;
@@ -17,21 +19,20 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
   const zoomPercentage = Math.round(stageScale * 100);
 
   return (
-    <div className="zoom-controls">
-      <button
-        className="zoom-btn"
+    <div className="absolute bottom-4 right-4 flex flex-col gap-2 bg-background/90 backdrop-blur-sm p-2 rounded-lg border shadow-sm z-10">
+      <Button
+        variant="outline"
+        size="icon"
         onClick={onZoomIn}
         disabled={stageScale >= 5}
         aria-label="Zoom in"
+        className="h-8 w-8"
       >
-        +
-      </button>
+        <Plus className="h-4 w-4" />
+      </Button>
 
       <div
-        className="zoom-indicator"
-        style={{
-          fontFamily: "Arial, sans-serif",
-        }}
+        className="flex items-center justify-center text-xs font-medium py-1 cursor-pointer hover:bg-accent rounded"
         onClick={onResetZoom}
         role="button"
         tabIndex={0}
@@ -40,14 +41,27 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         {zoomPercentage}%
       </div>
 
-      <button
-        className="zoom-btn"
+      <Button
+        variant="outline"
+        size="icon"
         onClick={onZoomOut}
         disabled={stageScale <= 0.1}
         aria-label="Zoom out"
+        className="h-8 w-8"
       >
-        -
-      </button>
+        <Minus className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onResetZoom}
+        aria-label="Reset zoom"
+        className="h-8 w-8 mt-1"
+        title="Reset Zoom"
+      >
+        <RotateCcw className="h-4 w-4" />
+      </Button>
     </div>
   );
 };

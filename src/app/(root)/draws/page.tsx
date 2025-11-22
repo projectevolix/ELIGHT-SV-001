@@ -17,7 +17,6 @@ import { Layer, Line, Text } from 'react-konva';
 import { KonvaCard } from '@/components/KonvaCard';
 import { ZoomControls } from '@/components/ZoomControls';
 import { Stage } from 'react-konva';
-import { DrawDTO } from '@/types/api/draws';
 
 export default function DrawsPage() {
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
@@ -203,9 +202,8 @@ export default function DrawsPage() {
         {!drawLoading && Object.keys(tournamentLayoutData).length > 0 && (
           <div
             ref={containerRef}
-            className="flex-1 w-full border rounded-lg overflow-hidden bg-background relative"
+            className="flex justify-center items-center w-full border rounded-lg overflow-hidden bg-background relative"
             style={{
-              minHeight: "600px",
               cursor: "grab",
             }}
           >
