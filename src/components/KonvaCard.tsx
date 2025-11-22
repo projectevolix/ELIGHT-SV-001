@@ -101,18 +101,7 @@ export const KonvaCard: FC<KonvaCardProps> = ({
     }
   };
 
-  const getPlayerBackgroundColor = (playerName: string) => {
-    if (status === "not-started") return "transparent";
 
-    if (winner === playerName) {
-      if (isFinal) {
-        return "#fef08a"; // Light yellow for champion
-      }
-      return "#bbf7d0"; // Light green for winner
-    }
-
-    return "transparent";
-  };
 
   const cardStrokeWidth = isCardHovered || isHighlighted ? 3 : 3;
   const cardStroke = getStatusBorderColor();
@@ -258,14 +247,14 @@ export const KonvaCard: FC<KonvaCardProps> = ({
         y={headerHeight + 1}
         width={playerBackgroundWidth}
         height={29}
-        fill={getPlayerBackgroundColor(player1)}
+        fill="#fee2e2" // Light Red for AKA
       />
 
       {/* Player 1 Name */}
       <Text
         x={textPaddingX}
         y={playerText1Y}
-        text={truncateText(player1, 15)}
+        text={truncateText(player1, 15) + (winner === player1 ? " 👑" : "")}
         fontSize={playerFontSize}
         fontFamily="Arial, sans-serif"
         fontStyle=""
@@ -273,15 +262,20 @@ export const KonvaCard: FC<KonvaCardProps> = ({
         width={cardWidth}
         align="left"
       />
-      {winner === player1 && !isBye && (
-        <Text
-          x={textPaddingX + 150}
-          y={playerText1Y}
-          text={isFinal ? "CAMP" : "WIN"}
-          fontSize={14}
-          fontFamily="Arial, sans-serif"
-        />
-      )}
+
+      {/* AKA Label */}
+      <Text
+        x={playerBackgroundWidth - 40}
+        y={playerText1Y}
+        text="AKA"
+        fontSize={10}
+        fontFamily="Arial, sans-serif"
+        fontStyle="bold"
+        fill="#991b1b" // Dark Red
+        width={30}
+        align="right"
+      />
+
       {/* Player Separator Line */}
       {!isBye && player2 && (
         <Line
@@ -300,31 +294,34 @@ export const KonvaCard: FC<KonvaCardProps> = ({
             y={headerHeight + 30}
             width={playerBackgroundWidth}
             height={29}
-            fill={getPlayerBackgroundColor(player2)}
+            fill="#dbeafe" // Light Blue for AO
           />
 
           <Text
             x={textPaddingX}
             y={playerText2Y}
-            text={truncateText(player2, 15)}
+            text={truncateText(player2, 15) + (winner === player2 ? " 👑" : "")}
             fontSize={playerFontSize}
             fontFamily="Arial, sans-serif"
             fill={colors.cardForeground}
             width={cardWidth}
             align="left"
           />
-          {winner === player2 && (
-            <Text
-              x={textPaddingX + 150}
-              y={playerText2Y}
-              text={isFinal ? "CAMP" : "WIN"}
-              fontSize={14}
-              fontFamily="Arial, sans-serif"
-            />
-          )}
+
+          {/* AO Label */}
+          <Text
+            x={playerBackgroundWidth - 40}
+            y={playerText2Y}
+            text="AO"
+            fontSize={10}
+            fontFamily="Arial, sans-serif"
+            fontStyle="bold"
+            fill="#1e40af" // Dark Blue
+            width={30}
+            align="right"
+          />
         </>
-      )
-      }
+      )}
 
       {/* View ScoreBoard Button - Hide for Bye matches */}
       {
